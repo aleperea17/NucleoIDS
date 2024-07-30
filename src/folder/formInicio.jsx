@@ -2,7 +2,7 @@ import "./formInicio.css"
 import {FaUser, FaLock} from "react-icons/fa"
 export function FormInicio(){
     return(
-       
+
         <body> 
              <img src="NucleoColor.png" alt=""/>
         <section>
