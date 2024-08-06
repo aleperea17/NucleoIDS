@@ -1,11 +1,14 @@
+import { Route } from "react-router";
 import "./App.css";
-import LoginForm from "./components/login-form";
+import LoginForm from "./components/forms/login-form";
+import RegisterForm from "./components/forms/register-form";
 
 function App() {
 	return (
 		<div className="">
 			{/* <FormInicio /> */}
-			<LoginForm />
+			{/* <LoginForm /> */}
+			<RegisterForm />
 		</div>
 	);
 }
