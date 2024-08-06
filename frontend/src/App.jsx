@@ -8,6 +8,7 @@ function App() {
 		<div className="">
 			{/* <FormInicio /> */}
 			{/* <LoginForm /> */}
+
 			<RegisterForm />
 		</div>
 	);
