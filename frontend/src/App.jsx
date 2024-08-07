@@ -1,17 +1,8 @@
-import { Route } from "react-router";
 import "./App.css";
-import LoginForm from "./components/forms/login-form";
-import RegisterForm from "./components/forms/register-form";
+import { Toaster } from "react-hot-toast";
 
 function App() {
-	return (
-		<div className="">
-			{/* <FormInicio /> */}
-			{/* <LoginForm /> */}
-
-			<RegisterForm />
-		</div>
-	);
+	return <div className=""></div>;
 }
 
 export default App;

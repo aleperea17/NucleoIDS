@@ -4,10 +4,16 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { sequelize } from "../db/db.js";
 import { UserModel } from "../models/user.js";
+import cors from "cors";
 import "dotenv/config";
 
 const app = express();
 app.use(express.json());
+app.use(
+	cors({
+		origin: "*",
+	}),
+);
 
 app.get("/usuarios", async (req, res) => {
 	try {
@@ -23,12 +29,19 @@ app.get("/usuarios", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-	const { username, password } = req.body;
+	const { username, email, password } = req.body;
 	try {
+		if (!username && !email) throw new Error("Campos requeridos");
 		const user = await UserModel.findOne({
-			where: {
-				username: username,
-			},
+			where: username
+				? {
+						username: username,
+					}
+				: email
+					? {
+							email: email,
+						}
+					: {},
 		});
 
 		if (!user) {
@@ -60,14 +73,15 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-	const { username, password } = req.body;
+	const { username, firstName, lastName, email, password } = req.body;
 	try {
 		const hashedPassword = bcrypt.hashSync(password, 8);
 
 		//TODO: Implementar el caso cuando el usuario con el mismo nombre esta creado
 		const user = await UserModel.create({
-			firstName: "",
-			lastName: "",
+			firstName,
+			lastName,
+			email,
 			username: username,
 			password: hashedPassword,
 		});

@@ -1,11 +1,33 @@
 import React from "react";
 import { Button, Card, Form, Input } from "react-daisyui";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export default function LoginForm() {
-	const { register, handleSubmit } = useForm();
+	const {
+		register,
+		handleSubmit,
+		formState: { isSubmitting },
+	} = useForm();
 
-	const onFormSubmit = () => {};
+	const onFormSubmit = async (data) => {
+		const response = await fetch("http://localhost:3000/login", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+		const response_parsed = await response.json();
+
+		if (response_parsed.success) {
+			toast.success("Sesión iniciada con éxito", { position: "top-right" });
+			localStorage.setItem("token", response_parsed.data.token);
+		} else {
+			toast.error("Algo salió mal!");
+		}
+	};
+
 	return (
 		<section className="min-h-screen bg-base-100 flex justify-center items-center">
 			<Card className="w-full max-w-lg shadow-xl rounded-lg p-8">
@@ -39,6 +61,7 @@ export default function LoginForm() {
 							<span className="label-text">Correo electrónico</span>
 						</label>
 						<Input
+							{...register("email")}
 							type="email"
 							placeholder="mi.correo@gmail.com"
 							className="input-bordered w-full mb-4"
@@ -47,12 +70,17 @@ export default function LoginForm() {
 							<span className="label-text">Contraseña</span>
 						</label>
 						<Input
+							{...register("password")}
 							type="password"
 							placeholder="********"
 							className="input-bordered w-full mb-4"
 						/>
-						<Button color="primary" className="w-full">
-							Login
+						<Button disabled={isSubmitting} color="primary" className="w-full">
+							{!isSubmitting ? (
+								"Login"
+							) : (
+								<span className="loading loading-dots loading-md"></span>
+							)}
 						</Button>
 					</Form>
 					<p className="text-center text-gray-600 mt-4">
