@@ -1,14 +1,30 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
+import { Toaster } from "react-hot-toast";
 
 export const router = createBrowserRouter([
 	{
-		path: "/login",
-		Component: LoginForm,
+		path: "/",
+		element: <span>Has iniciado sesión</span>,
 	},
 	{
-		path: "/register",
-		Component: RegisterForm,
+		path: "/auth",
+		element: (
+			<>
+				<Toaster />
+				<Outlet />
+			</>
+		),
+		children: [
+			{
+				path: "login",
+				element: <LoginForm />,
+			},
+			{
+				path: "register",
+				element: <RegisterForm />,
+			},
+		],
 	},
 ]);

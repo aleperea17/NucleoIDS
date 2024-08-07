@@ -13,6 +13,11 @@ export const UserModel = sequelize.define("User", {
 		unique: true,
 		allowNull: false,
 	},
+	email: {
+		type: DataTypes.STRING(),
+		unique: true,
+		allowNull: false,
+	},
 	password: {
 		type: DataTypes.STRING(),
 		allowNull: false,
