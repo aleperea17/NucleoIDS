@@ -2,8 +2,13 @@ import React from "react";
 import { Button, Card, Form, Input } from "react-daisyui";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
+	const [_, setToken] = useLocalStorage("token", "");
+
+	const navigate = useNavigate();
 	const {
 		register,
 		handleSubmit,
@@ -22,7 +27,8 @@ export default function LoginForm() {
 
 		if (response_parsed.success) {
 			toast.success("Sesión iniciada con éxito", { position: "top-right" });
-			localStorage.setItem("token", response_parsed.data.token);
+			setToken(response_parsed.data.token);
+			navigate("/dashboard");
 		} else {
 			toast.error("Algo salió mal!");
 		}
@@ -85,7 +91,7 @@ export default function LoginForm() {
 					</Form>
 					<p className="text-center text-gray-600 mt-4">
 						No tienes una cuenta?{" "}
-						<a href="/signup" className="text-primary">
+						<a href="register" className="text-primary">
 							Crea una cuenta
 						</a>
 					</p>
