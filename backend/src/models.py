@@ -16,10 +16,7 @@ class User(db.Entity):
     email = Required(str)
     password = Required(str)
     firstName = Required(str, column="firstName")
-    lastName = Required(str, column="lastName")
-    role = Required(Roles, default=Roles.STUDENT)
+    lastName = Required(str,column="lastName")
+    role = Enum("Roles",["ADMIN", "STUDENT", "TEACHER"])
     _table_ = "Users"
-
-
-
 
