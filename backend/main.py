@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from fastapi import FastAPI,HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
@@ -7,6 +8,14 @@ from src.db import db
 from pony.orm import *
 from src import schemas
 from jose import jwt
+=======
+from fastapi import FastAPI
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.middleware.cors import CORSMiddleware
+from src.db import db
+from src.controllers.auth_controller import router as auth_router
+from src.controllers.users_controller import router as users_router
+>>>>>>> Stashed changes
 
 app = FastAPI()
 
@@ -14,10 +23,13 @@ app = FastAPI()
 db.generate_mapping(create_tables=True)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+<<<<<<< Updated upstream
 # Clave secreta para JWT
 SECRET_KEY = "your-secret-key"  # Cambia esto por una clave secreta segura
 
 
+=======
+>>>>>>> Stashed changes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,6 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< Updated upstream
 @app.get("/users")
 def users():
     try:
@@ -65,3 +78,16 @@ def login(request: schemas.LoginRequest):
         "success": True,
         "data": {"auth": True, "token": token}
     }
+=======
+# Lista de Rutas
+
+# Auth
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
+
+# Usuarios
+app.include_router(users_router, prefix="/users", tags=["usuarios"])
+
+
+# Clave secreta para JWT
+SECRET_KEY = "your-secret-key"  # Cambia esto por una clave secreta segura
+>>>>>>> Stashed changes
