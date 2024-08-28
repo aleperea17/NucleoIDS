@@ -6,6 +6,7 @@ import TeachersTable from "../components/table/TeachersTable";
 import StudentTable from "../components/table/StudentTable";
 import DashboardPage from "./dashboard/dashboard";
 import TestPage from "./test-page/page";
+import TeachersPage from "./dashboard/teachers/teachers-page";
 
 export const router = createBrowserRouter([
 	{
@@ -50,6 +51,8 @@ export const router = createBrowserRouter([
 			{
 				path: "/teachers",
 				element: <></>,
+				path: "teachers",
+				element: <TeachersPage />,
 			},
 		],
 	},
