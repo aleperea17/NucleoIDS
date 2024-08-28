@@ -2,7 +2,6 @@ from fastapi import HTTPException, APIRouter
 from pony.orm import *
 from src import schemas
 from jose import jwt
-
 from src.services.user_services import UsersService
 
 # Auth controller
