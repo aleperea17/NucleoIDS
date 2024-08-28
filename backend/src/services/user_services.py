@@ -19,7 +19,8 @@ class UsersService:
                     email=user.email,
                     password=self.hash_password(user.password),
                     firstName=user.firstName,
-                    lastName=user.lastName
+                    lastName=user.lastName,
+                    role=user.role,
                 )
                 print("Usuario creado correctamente.")
                 user_dict = usuario.to_dict(exclude=['id'])

@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 import { Card, Input, Button } from "react-daisyui";
 import { useForm } from "react-hook-form";
@@ -12,16 +13,13 @@ const RegisterForm = () => {
 
 	const onFormSubmit = async (data) => {
 		const { confirmPassword, ...rest } = data;
-		const response = await fetch("http://localhost:3000/register", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(rest),
+		const response = await axios.post("http://localhost:8000/auth/register", {
+			...rest,
+			role: "STUDENT",
 		});
-		const response_parsed = await response.json();
 
-		if (response_parsed.success) {
+		console.log(response);
+		if (response.data.success) {
 			toast.success("Cuenta creada con éxito", { position: "top-right" });
 		} else {
 			toast.error("Algo salió mal!", { position: "top-right" });

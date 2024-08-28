@@ -6,14 +6,16 @@ import {
   Avatar,
 } from "react-daisyui";
 import useLocalStorage from "../../hooks/useLocalStorage";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const [token, setToken] = useLocalStorage("token", null);
+  const { pathname } = useLocation();
 
+  console.log(pathname);
   const navigate = useNavigate();
   return (
-    <DaisyUINavbar className="bg-base-100 shadow">
+    <DaisyUINavbar className="bg-base-100 shadow-md">
       <DaisyUINavbar.Start>
         <Button color="ghost" className="normal-case text-xl">
           <img
@@ -30,7 +32,12 @@ export const Navbar = () => {
         <Button color="ghost" className="normal-case">
           Alumnos
         </Button>
-        <Button color="ghost" className="normal-case">
+        <Button
+          color="ghost"
+          className="normal-case"
+          active={pathname.includes("teachers")}
+          onClick={() => navigate("/dashboard/teachers")}
+        >
           Profesores
         </Button>
         <Button color="ghost" className="normal-case"></Button>

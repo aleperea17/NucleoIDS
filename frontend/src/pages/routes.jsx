@@ -3,6 +3,8 @@ import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
 import { Toaster } from "react-hot-toast";
 import DashboardPage from "./dashboard/dashboard";
+import TeachersPage from "./dashboard/teachers/teachers-page";
+import { SWRConfig } from "swr";
 
 export const router = createBrowserRouter([
 	{
@@ -31,5 +33,11 @@ export const router = createBrowserRouter([
 	{
 		path: "/dashboard",
 		element: <DashboardPage />,
+		children: [
+			{
+				path: "teachers",
+				element: <TeachersPage />,
+			},
+		],
 	},
 ]);
