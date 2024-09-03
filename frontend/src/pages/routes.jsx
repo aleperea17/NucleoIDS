@@ -3,6 +3,7 @@ import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
 import { Toaster } from "react-hot-toast";
 import DashboardPage from "./dashboard/dashboard";
+import TestPage from "./test-page/page";
 
 export const router = createBrowserRouter([
 	{
@@ -31,5 +32,11 @@ export const router = createBrowserRouter([
 	{
 		path: "/dashboard",
 		element: <DashboardPage />,
+		children: [
+			{
+				path: "test-page",
+				element: <TestPage />,
+			},
+		],
 	},
 ]);
