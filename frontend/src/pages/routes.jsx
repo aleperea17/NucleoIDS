@@ -32,11 +32,5 @@ export const router = createBrowserRouter([
 	{
 		path: "/dashboard",
 		element: <DashboardPage />,
-		children: [
-			{
-				path: "test-components",
-				element: <ComponentsTestPage />,
-			},
-		],
 	},
 ]);
