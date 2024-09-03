@@ -20,3 +20,15 @@ class User(db.Entity):
     role = Enum("Roles",["ADMIN", "STUDENT", "TEACHER"])
     _table_ = "Users"
 
+
+class Student(db.Entity):
+    id = PrimaryKey(uuid.UUID, auto=True)
+    dni = Required(str)
+    username = Required(str)
+    email = Required(str)
+    password = Required(str)
+    firstName = Required(str, column="firstName")
+    lastName = Required(str, column="lastName")
+    encoding = Required(Json)
+    _table_ = "Students"
+
