@@ -3,7 +3,6 @@ import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
 import { Toaster } from "react-hot-toast";
 import DashboardPage from "./dashboard/dashboard";
-import ComponentsTestPage from "./dashboard/components";
 
 export const router = createBrowserRouter([
 	{
