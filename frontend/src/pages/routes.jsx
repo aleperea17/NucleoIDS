@@ -2,6 +2,8 @@ import { createBrowserRouter, Outlet } from "react-router-dom";
 import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
 import { Toaster } from "react-hot-toast";
+import TeachersTable from "../components/table/TeachersTable";
+import StudentTable from "../components/table/StudentTable";
 import DashboardPage from "./dashboard/dashboard";
 
 export const router = createBrowserRouter([
@@ -41,9 +43,5 @@ export const router = createBrowserRouter([
 				element: <RegisterForm />,
 			},
 		],
-	},
-	{
-		path: "/dashboard",
-		element: <DashboardPage />,
 	},
 ]);

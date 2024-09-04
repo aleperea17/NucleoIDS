@@ -4,7 +4,7 @@ import fotos from './img';
 const alumnosData = [
   { name: 'Juan Pérez', badge: 'Programación', avatar: fotos.img6 },
   { name: 'María López', badge: 'Robótica', avatar: fotos.img7 },
-  // para otros alumnoi
+  // para otros alumnos
 ];
 
 const alumnosColumns = [

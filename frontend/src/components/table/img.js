@@ -4,6 +4,7 @@ import alejandro from './fotos/alejandro.png'
 import mati from './fotos/mati.png'
 import jorge from './fotos/jorge.png'
 
+
 export default{
     "img1": diego, 
     "img2": rossi,
