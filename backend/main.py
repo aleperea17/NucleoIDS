@@ -1,22 +1,15 @@
-
-
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from src.crud import get_users, create_user, search_user
+from src.db import db
 from pony.orm import *
-from src import schemas
-from jose import jwt
 from fastapi import FastAPI
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
-from src.db import db
-from src.controllers.auth_controller import router as auth_router
-from src.controllers.users_controller import router as users_router
-from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.middleware.cors import CORSMiddleware
-from src.db import db
-from src.controllers.auth_controller import router as auth_router
-from src.controllers.users_controller import router as users_router
+from .src.controllers.auth_controller import router as auth_router
+from .src.controllers.users_controller import router as users_router
+from .src.controllers.ai_recognition_controller import router as ai_router
 
 app = FastAPI()
 
@@ -42,3 +35,4 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["usuarios"])
 
 
+app.include_router(ai_router, prefix="/students",tags=["estudiantes"])

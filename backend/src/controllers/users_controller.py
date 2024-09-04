@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
-from src.models import Roles
-from src.services.user_services import UsersService
+from ...src.models import Roles
+from ...src.services.user_services import UsersService
 
 
 router = APIRouter()

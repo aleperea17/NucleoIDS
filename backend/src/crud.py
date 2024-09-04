@@ -52,3 +52,5 @@ def check_password(stored_password: str, provided_password: str) -> bool:
 
 # crear_usuario(schemas.UserCreate(username="Alejandro",email="@DFSFMSD",password="lkdsgajjhosdfh3", firstName="Daniel",lastName="Perea"))
 
+
+

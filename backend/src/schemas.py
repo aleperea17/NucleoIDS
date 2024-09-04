@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-
-from src.models import Roles
+from typing import List
+from ..src.models import Roles
 
 
 class BaseUser(BaseModel):
@@ -28,6 +28,12 @@ class LoginRequest(BaseModel):
 
 # Modelo para recibir la imagen en base64 del front.
 
-
 class ImageRequest(BaseModel):
     image_base64: str
+
+class Student(BaseModel):
+    dni : str
+    email : str
+    firstName: str
+    lastName : str
+    encoding: str
