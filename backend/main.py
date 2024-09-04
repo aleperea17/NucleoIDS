@@ -1,8 +1,7 @@
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from src.crud import get_users, create_user, search_user
-from src.db import db
+from .src.db import db
 from pony.orm import *
 from fastapi import FastAPI
 from fastapi.security import OAuth2PasswordBearer
