@@ -19,9 +19,10 @@ export default function LoginForm() {
 	const onFormSubmit = async (data) => {
 		const response = await axios.post("http://localhost:8000/auth/login", data);
 
+		console.log(response.data);
 		if (response.data.success) {
 			toast.success("Sesión iniciada con éxito", { position: "top-right" });
-			setToken(response.data.token);
+			setToken(response.data.data.token);
 			navigate("/dashboard");
 		} else {
 			toast.error("Algo salió mal!");

@@ -8,17 +8,8 @@ import DashboardPage from "./dashboard/dashboard";
 import TestPage from "./test-page/page";
 import TeachersPage from "./dashboard/teachers/teachers-page";
 import StudentsPage from "./dashboard/students/students-page";
-import useLocalStorage from "../hooks/useLocalStorage";
 
-const Redirect = () => {
-	const [token] = useLocalStorage("token");
-	return <Navigate to={token ? "/dashboard" : "/auth/login"} />;
-};
 export const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <Redirect />,
-	},
 	{
 		path: "/teacherstable",
 		element: <TeachersTable />,
