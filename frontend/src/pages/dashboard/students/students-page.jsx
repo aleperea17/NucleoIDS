@@ -21,7 +21,7 @@ export default function StudentsPage() {
       ...rest,
     });
 
-    if (response.data.success) {
+    if (response.data.dni) {
       toast.success("Alumno creado con éxito", { position: "top-right" });
       mutate();
       methods.reset();
