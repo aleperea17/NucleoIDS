@@ -3,6 +3,7 @@ from pony.orm import *
 from src import schemas
 from jose import jwt
 from src.services.user_services import UsersService
+from pydantic import BaseModel
 
 # Auth controller
 
@@ -14,10 +15,29 @@ service = UsersService()
 SECRET_KEY = "your-secret-key"
 
 
-@router.post("/register", response_model=schemas.BaseUser, status_code=201)
+class RegisterMessage(BaseModel):
+    message: str
+    success: bool
+
+
+@router.post("/register", response_model=RegisterMessage, status_code=201)
 def register(user: schemas.UserCreate):
-    user_created = service.create_user(user)
-    return user_created
+    try:
+        user_created = service.create_user(user)
+        return {
+            "message": "Usuario creado correctamente",
+            "success": True,
+        }
+    except HTTPException as e:
+        # Maneja el error y devuelve un mensaje personalizado
+        return {
+            "message": e.detail,
+            "success": False, }
+    except Exception as e:
+        return {
+            "message": "Error inesperado al crear el usuario.",
+            "success": False,
+        }
 
 
 @router.post("/login")
