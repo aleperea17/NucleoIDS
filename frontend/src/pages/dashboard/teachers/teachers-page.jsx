@@ -1,15 +1,17 @@
 import React from "react";
-import Table from "../../../components/table/table";
-import useUsers from "../../../hooks/users/use-users";
-import { Badge, Button, Mask, Modal } from "react-daisyui";
+import { Badge, Button, Mask, Modal, Pagination, Select } from "react-daisyui";
 import TeacherCreateForm from "./teacher-create-form";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Heading from "../../../components/common/heading";
+import Table from "../../../components/table/Table";
+import useUsers from "../../../hooks/use-user";
 
 export default function TeachersPage() {
-	const { users, isLoading, error, mutate } = useUsers({ role: "TEACHER" });
+	const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
+		role: "TEACHER",
+	});
 
 	const methods = useForm();
 
@@ -23,12 +25,12 @@ export default function TeachersPage() {
 		if (response.data.success) {
 			toast.success("Profesor creado con éxito", { position: "top-right" });
 			mutate();
+			methods.reset();
 		} else {
 			toast.error("Algo salió mal!", { position: "top-right" });
 		}
 	};
 
-	console.log(methods.formState);
 	const roleMap = {
 		TEACHER: "Profesor",
 	};
@@ -68,16 +70,33 @@ export default function TeachersPage() {
 			render: (email) => <div>{email}</div>,
 		},
 	];
-	const { Dialog, handleShow } = Modal.useDialog();
+	const { Dialog, handleShow, handleHide } = Modal.useDialog();
+
 	return (
 		<section className="px-10 py-5">
 			<Heading
 				title="Lista de Profesores"
 				description="Acá podrás encontrar la lista de todos los profesores"
 				action={
-					<Button onClick={handleShow} color="primary">
-						Añadir Profesor
-					</Button>
+					<div className="flex flex-row gap-3 items-center">
+						<Button onClick={handleShow} color="primary">
+							Añadir Profesor
+						</Button>
+
+						<Select
+							value={count}
+							onChange={(event) => {
+								helpers.changeCount(parseInt(event.target.value));
+							}}
+						>
+							<option value={"default"} disabled>
+								Cantidad de profesores
+							</option>
+							<option value={1}>1</option>
+							<option value={5}>5</option>
+							<option value={10}>10</option>
+						</Select>
+					</div>
 				}
 			/>
 			<Dialog>
@@ -92,16 +111,19 @@ export default function TeachersPage() {
 							</div>
 						</Modal.Body>
 						<Modal.Actions>
-							<Button type="submit">Crear</Button>
+							<Button onClick={handleHide} type="button" color="error">
+								Cancelar
+							</Button>
+							<Button type="submit" color="primary">
+								Crear
+							</Button>
 						</Modal.Actions>
 					</form>
 				</FormProvider>
 			</Dialog>
-			<Table
-				data={users ? users.users : []}
-				columns={columns}
-				loading={isLoading}
-			/>
+			<section className="shadow-lg rounded-lg">
+				<Table data={data ? data.users : []} columns={columns} />
+			</section>
 		</section>
 	);
 }

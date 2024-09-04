@@ -21,5 +21,18 @@ class User(db.Entity):
     _table_ = "Users"
 
 
+class Student(db.Entity):
+    id = PrimaryKey(uuid.UUID, auto=True)
+    dni = Required(str, unique=True)
+    email = Optional(str)
+    firstName = Required(str, column="firstName")
+    lastName = Required(str, column="lastName")
+    encoding = Optional("Encoding")
+    _table_ = "Students"
 
 
+class Encoding(db.Entity):
+    id = PrimaryKey(uuid.UUID, auto=True)
+    data = Required(str)
+    student = Optional("Student")
+    _table_ = "Encodings"

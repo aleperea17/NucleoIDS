@@ -33,7 +33,7 @@ export default function useUsers(config) {
 
   console.log(import.meta.env.VITE_PUBLIC_API_URL);
   const { data, isLoading, error, mutate } = useSWR(
-    `${import.meta.env.VITE_PUBLIC_API_URL}/users/?page=${page}&count=${count}&order=asc${config && config.role ? `role=${config.role}` : ""}`,
+    `${import.meta.env.VITE_PUBLIC_API_URL}/users/?page=${page}&count=${count}&order=asc${config && config.role ? `&role=${config.role}` : ""}`,
     getAllUsers,
   );
 
@@ -61,5 +61,5 @@ export default function useUsers(config) {
     changeCount,
   };
 
-  return { data, isLoading, error, mutate, helpers };
+  return { data, isLoading, error, mutate, helpers, count, page };
 }

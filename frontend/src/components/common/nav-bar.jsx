@@ -29,7 +29,12 @@ export const Navbar = () => {
         <Button color="ghost" className="normal-case">
           Dashboard
         </Button>
-        <Button color="ghost" className="normal-case">
+        <Button
+          color="ghost"
+          className="normal-case"
+          active={pathname.includes("students")}
+          onClick={() => navigate("/dashboard/students")}
+        >
           Alumnos
         </Button>
         <Button
