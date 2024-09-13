@@ -1,10 +1,10 @@
 from pony.orm import db_session, desc, select
 from fastapi import HTTPException, Query
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 import bcrypt
 from pony.orm.core import TransactionIntegrityError
-from src import models, schemas
+from ...src import models, schemas
 
 
 class UsersService:

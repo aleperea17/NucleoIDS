@@ -16,10 +16,23 @@ class User(db.Entity):
     email = Required(str)
     password = Required(str)
     firstName = Required(str, column="firstName")
-    lastName = Required(str, column="lastName")
-    role = Required(Roles, default=Roles.STUDENT)
+    lastName = Required(str,column="lastName")
+    role = Enum("Roles",["ADMIN", "STUDENT", "TEACHER"])
     _table_ = "Users"
 
 
+class Student(db.Entity):
+    id = PrimaryKey(uuid.UUID, auto=True)
+    dni = Required(str, unique=True)
+    email = Optional(str)
+    firstName = Required(str, column="firstName")
+    lastName = Required(str, column="lastName")
+    encoding = Optional("Encoding")
+    _table_ = "Students"
 
+class Encoding(db.Entity):
+    id = PrimaryKey(uuid.UUID, auto=True)
+    data = Required(str)
+    student = Optional("Student")
+    _table_ = "Encodings"
 
