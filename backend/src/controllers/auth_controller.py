@@ -4,6 +4,7 @@ from ...src import schemas
 from jose import jwt
 from ...src.services.user_services import UsersService
 from pydantic import BaseModel
+from decouple import config
 
 # Auth controller
 
@@ -12,7 +13,7 @@ router = APIRouter()
 service = UsersService()
 
 
-SECRET_KEY = "your-secret-key"
+SECRET_KEY = config("SECRET")
 
 
 class RegisterMessage(BaseModel):
