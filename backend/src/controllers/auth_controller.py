@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter,status
 from pony.orm import *
 from ...src import schemas
-from jose import jwt
+from jose import jwt, JWTError, ExpiredSignatureError
 from ...src.services.user_services import UsersService
 from pydantic import BaseModel
 from decouple import config
@@ -38,12 +38,12 @@ def verify_token(request: schemas.TokenVerificationRequest):
         return {
             "message": "Token válido",
             "success": True,
-            "data": {"auth": True, "user": user}
+            "data": {"auth": True, "user": user.to_dict()}
         }
 
-    except jwt.ExpiredSignatureError:
+    except ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expirado")
-    except jwt.InvalidTokenError:
+    except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido")
 
 @router.post("/register", response_model=RegisterMessage, status_code=201)
