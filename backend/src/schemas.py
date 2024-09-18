@@ -37,3 +37,6 @@ class Student(BaseModel):
     firstName: str
     lastName : str
     encoding: str
+
+class TokenVerificationRequest(BaseModel):
+    token: str

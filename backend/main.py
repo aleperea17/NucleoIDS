@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from .src.db import db
 from pony.orm import *
 from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from .src.controllers.auth_controller import router as auth_router
 from .src.controllers.users_controller import router as users_router
@@ -14,7 +13,6 @@ app = FastAPI()
 
 # Mapeando las entidades a tablas (si no existe la tabla, la crea)
 db.generate_mapping(create_tables=True)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 app.add_middleware(
