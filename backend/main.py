@@ -33,3 +33,26 @@ app.include_router(users_router, prefix="/users", tags=["usuarios"])
 
 
 app.include_router(ai_router, prefix="/students",tags=["estudiantes"])
+
+# Personalizar el esquema de seguridad en OpenAPI para usar Bearer tokens
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = app._original_openapi()  # Cambiado a _original_openapi
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+        }
+    }
+    for path in openapi_schema["paths"].values():
+        for method in path.values():
+            method["security"] = [{"BearerAuth": []}]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+# Guardamos la referencia original del método openapi
+app._original_openapi = app.openapi
+# Reemplazamos el método openapi por nuestra función personalizada
+app.openapi = custom_openapi
