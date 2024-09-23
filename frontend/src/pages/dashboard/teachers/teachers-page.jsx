@@ -21,7 +21,6 @@ export default function TeachersPage() {
 			...rest,
 			role: "TEACHER",
 		});
-
 		if (response.data.success) {
 			toast.success("Profesor creado con éxito", { position: "top-right" });
 			mutate();

@@ -4,11 +4,7 @@ import { useForm, useFormContext } from "react-hook-form";
 import toast from "react-hot-toast";
 
 export default function TeacherCreateForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useFormContext();
+  const { register } = useFormContext();
 
   return (
     <>
