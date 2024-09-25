@@ -13,6 +13,7 @@ class BaseUser(BaseModel):
     class Config:
         # antes orm_mode=True
         from_attributes = True
+        use_enum_values = True
 
 
 class UserCreate(BaseUser):
@@ -37,3 +38,6 @@ class Student(BaseModel):
     firstName: str
     lastName : str
     encoding: str
+
+class TokenVerificationRequest(BaseModel):
+    token: str
