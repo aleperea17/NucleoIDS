@@ -35,4 +35,3 @@ class Encoding(db.Entity):
     data = Required(str)
     student = Optional("Student")
     _table_ = "Encodings"
-
