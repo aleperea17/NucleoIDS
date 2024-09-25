@@ -1,10 +1,10 @@
 from pony.orm import db_session, desc, select
 from fastapi import HTTPException, Query
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 import bcrypt
 from pony.orm.core import TransactionIntegrityError
-from src import models, schemas
+from ...src import models, schemas
 
 
 class UsersService:
@@ -71,6 +71,15 @@ class UsersService:
             "users": users_conversion,
         }
 
+    def search_user_by_id(self, user_id: str):
+        with db_session:
+            try:
+                user_id = UUID(user_id)  # Convertir el user_id a UUID
+                user = select(u for u in models.User if u.id == user_id).first()
+                return user if user else None
+            except Exception as e:
+                return None
+    
     def search_user(self, username: Optional[str], email: Optional[str], password: str) -> models.User:
         with db_session:
             user = select(u for u in models.User if (

@@ -1,13 +1,12 @@
 from typing import Optional
 from uuid import UUID, uuid4
-from fastapi import APIRouter, Query
-from fastapi.exceptions import HTTPException
+from fastapi import APIRouter, Query, Depends, HTTPException
 from pony.orm import db_session, desc, select
 from pydantic import BaseModel
-from src import models
-from src.models import Roles, Student
-from src.services.user_services import UsersService
-
+from ...src import models
+from ...src.models import Roles, Student
+from ...src.services.user_services import UsersService
+from .auth_controller import get_current_user
 
 router = APIRouter()
 user_service = UsersService()
@@ -49,7 +48,7 @@ def get_students(
 
 
 @router.get("/")
-async def get_users(
+async def get_users(token:str = Depends(get_current_user),
     page: int = Query(1, ge=1, description="Número de página"),
     count: int = Query(
         10, ge=1, le=100, description="Número de usuarios por página"),
@@ -59,13 +58,16 @@ async def get_users(
         "asc", regex="^(asc|desc)$", description="Ordena de forma asc o desc"),
     role: Roles | None = Query(None, description="Filtrar por rol"),
 ):
-    if role == Roles.STUDENT:
-        list_of_students = get_students(page, count, sort, role)
-        return list_of_students
-    else:
-        list_of_users = user_service.get_users(page, count, sort, order, role)
-        print(list_of_users)
-        return list_of_users
+    try: 
+        if role == Roles.STUDENT:
+            list_of_students = get_students(page, count, sort, role)
+            return list_of_students
+        else:
+            list_of_users = user_service.get_users(page, count, sort, order, role)
+            print(list_of_users)
+            return list_of_users
+    except:
+        raise HTTPException(status_code=401, detail="Token inválido o expirado")
 
 
 class StudentCreateRequest(BaseModel):
