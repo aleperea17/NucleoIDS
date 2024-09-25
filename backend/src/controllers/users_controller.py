@@ -20,3 +20,5 @@ async def get_users(
 ):
     list_of_users = user_service.get_users(page, count, sort, order, role)
     return list_of_users
+
+
