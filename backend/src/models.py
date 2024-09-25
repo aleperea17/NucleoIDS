@@ -35,9 +35,3 @@ class Encoding(db.Entity):
     data = Required(str)
     student = Optional("Student")
     _table_ = "Encodings"
-
-class Encoding(db.Entity):
-    id = PrimaryKey(uuid.UUID, auto=True)
-    data = Required(str)
-    student = Optional("Student")
-    _table_ = "Encodings"
