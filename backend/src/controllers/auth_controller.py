@@ -1,8 +1,8 @@
 from fastapi import HTTPException, APIRouter,status, Depends
 from pony.orm import *
-from ...src import schemas
+from src import schemas
 from jose import jwt, JWTError, ExpiredSignatureError
-from ...src.services.user_services import UsersService
+from src.services.user_services import UsersService
 from pydantic import BaseModel
 from decouple import config
 from fastapi.security import OAuth2PasswordBearer

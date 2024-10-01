@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID
 import bcrypt
 from pony.orm.core import TransactionIntegrityError
-from ...src import models, schemas
+from src import models, schemas
 
 
 class UsersService:

@@ -1,8 +1,8 @@
 from fastapi import APIRouter,HTTPException
-from ..services.ai_recognition_services import AiRecognition
-from ..services.student_services import StudentsService
+from services.ai_recognition_services import AiRecognition
+from services.student_services import StudentsService
 from pony.orm import db_session
-from ...src import schemas,models
+from src import schemas,models
 
 router = APIRouter()
 

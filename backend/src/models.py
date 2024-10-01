@@ -1,7 +1,7 @@
 import uuid
 from pony.orm import *
 from enum import Enum
-from .db import db
+from db import db
 
 
 class Roles(str, Enum):

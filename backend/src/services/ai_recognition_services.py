@@ -5,12 +5,13 @@ from typing import List
 from PIL import Image
 import face_recognition
 from pony.orm import select
+
+# from src.services import student_services
 from ...src import models
 import numpy as np
 import json
-from . import student_services
 
-student_services = student_services.StudentsService()
+# student_service = student_services.StudentsService()
 
 class AiRecognition():
     def __init__(self):

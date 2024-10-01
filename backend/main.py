@@ -1,13 +1,13 @@
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .src.db import db
+from src.db import db
 from pony.orm import *
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .src.controllers.auth_controller import router as auth_router
-from .src.controllers.users_controller import router as users_router
-from .src.controllers.ai_recognition_controller import router as ai_router
+from src.controllers.auth_controller import router as auth_router
+from src.controllers.users_controller import router as users_router
+from src.controllers.ai_recognition_controller import router as ai_router
 
 app = FastAPI()
 
