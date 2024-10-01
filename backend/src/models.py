@@ -1,7 +1,7 @@
 import uuid
 from pony.orm import *
 from enum import Enum
-from db import db
+from src.db import db
 
 
 class Roles(str, Enum):
@@ -16,7 +16,7 @@ class User(db.Entity):
     email = Required(str)
     password = Required(str)
     firstName = Required(str, column="firstName")
-    lastName = Required(str,column="lastName")
+    lastName = Required(str, column="lastName")
     role = Required(str)
     _table_ = "Users"
 
@@ -29,6 +29,7 @@ class Student(db.Entity):
     lastName = Required(str, column="lastName")
     encoding = Optional("Encoding")
     _table_ = "Students"
+
 
 class Encoding(db.Entity):
     id = PrimaryKey(uuid.UUID, auto=True)
