@@ -1,13 +1,3 @@
 {
-	"routes": [
-		{ "src": "/teacherstable", "dest": "/" },
-		{ "src": "/studenttable", "dest": "/" },
-		{ "src": "/auth", "dest": "/" },
-		{ "src": "/auth/login", "dest": "/" },
-		{ "src": "/auth/register", "dest": "/" },
-		{ "src": "/dashboard", "dest": "/" },
-		{ "src": "/dashboard/teachers", "dest": "/" },
-		{ "src": "/dashboard/students", "dest": "/" },
-		{ "src": "/(.*)", "dest": "/" }
-	]
+	"rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
