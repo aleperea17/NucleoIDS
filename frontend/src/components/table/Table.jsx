@@ -1,4 +1,4 @@
-import fotos from './img';
+import fotos from "./img";
 
 const Table = ({ title, data, columns }) => {
   return (
@@ -15,35 +15,22 @@ const Table = ({ title, data, columns }) => {
         <thead>
           <tr>
             {columns.map((column, index) => (
-              <th key={index} className="text-xl">
-                {column.label}
+              <th key={`table-column-${index}`} className="text-xl">
+                {column.header}
               </th>
             ))}
-            <th></th>
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <th></th>
-              <td>
-                <div className="flex items-center gap-5">
-                  <div className="avatar">
-                    <div className="mask mask-squircle h-12 w-12">
-                      <img src={item.avatar || fotos.img1} alt="Photo" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="font-bold text-lg">{item.name}</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span className="badge text-base">{item.badge}</span>
-              </td>
-              <th>
-                <button className="btn btn-link">Editar</button>
-              </th>
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {columns.map((column, colIndex) => (
+                <td key={colIndex}>
+                  {column.render
+                    ? column.render(row[column.accessor], row)
+                    : row[column.accessor]}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
