@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from src import models
 from src.models import Roles, Student
 from src.services.user_services import UsersService
-from auth_controller import get_current_user
+from src.controllers.auth_controller import get_current_user
 
 router = APIRouter()
 user_service = UsersService()
@@ -48,9 +48,9 @@ def get_students(
 
 
 @router.get("/")
-async def get_users(token:str = Depends(get_current_user),
-    page: int = Query(1, ge=1, description="Número de página"),
-    count: int = Query(
+async def get_users(token: str = Depends(get_current_user),
+                    page: int = Query(1, ge=1, description="Número de página"),
+                    count: int = Query(
         10, ge=1, le=100, description="Número de usuarios por página"),
     sort: str | None = Query(
         None, description="Sort by field (e.g., 'username', 'email')"),
@@ -58,16 +58,18 @@ async def get_users(token:str = Depends(get_current_user),
         "asc", regex="^(asc|desc)$", description="Ordena de forma asc o desc"),
     role: Roles | None = Query(None, description="Filtrar por rol"),
 ):
-    try: 
+    try:
         if role == Roles.STUDENT:
             list_of_students = get_students(page, count, sort, role)
             return list_of_students
         else:
-            list_of_users = user_service.get_users(page, count, sort, order, role)
+            list_of_users = user_service.get_users(
+                page, count, sort, order, role)
             print(list_of_users)
             return list_of_users
     except:
-        raise HTTPException(status_code=401, detail="Token inválido o expirado")
+        raise HTTPException(
+            status_code=401, detail="Token inválido o expirado")
 
 
 class StudentCreateRequest(BaseModel):
