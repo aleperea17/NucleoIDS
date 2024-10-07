@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from ..src.models import Roles
+from src.models import Roles
 from datetime import date
 
 class BaseProfessor(BaseModel):
