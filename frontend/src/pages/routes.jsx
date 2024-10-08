@@ -11,6 +11,10 @@ import StudentsPage from "./dashboard/students/students-page";
 
 export const router = createBrowserRouter([
 	{
+		path: "/",
+		element: <Navigate to="/dashboard" />,
+	},
+	{
 		path: "/teacherstable",
 		element: <TeachersTable />,
 	},
