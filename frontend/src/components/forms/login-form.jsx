@@ -17,12 +17,18 @@ export default function LoginForm() {
 	} = useForm();
 
 	const onFormSubmit = async (data) => {
-		const response = await axios.post("http://localhost:8000/auth/login", data);
+		const response = await axios.post(
+			"http://localhost:8000/auth/login",
+			null,
+			{
+				params: data,
+			},
+		);
 
 		console.log(response.data);
 		if (response.data.success) {
 			toast.success("Sesión iniciada con éxito", { position: "top-right" });
-			setToken(response.data.data.token);
+			setToken(response.data.access_token);
 			navigate("/dashboard");
 		} else {
 			toast.error("Algo salió mal!");
