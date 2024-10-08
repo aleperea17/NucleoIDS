@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter
 from pony.orm import *
-from ...src import schemas
-from ...src.services.professor_services import ProfessorService
+from src import schemas
+from src.services.professor_services import ProfessorService
 from pydantic import BaseModel
 
 # Profesor controller

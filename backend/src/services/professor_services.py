@@ -2,7 +2,7 @@ from pony.orm import db_session, select
 from fastapi import HTTPException
 from uuid import UUID
 from pony.orm.core import TransactionIntegrityError
-from ...src import models, schemas
+from src import models, schemas
 
 class ProfessorService:
     def __init__(self):
