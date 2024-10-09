@@ -54,7 +54,10 @@ def detect_face(base64_string: schemas.ImageRequest):
     try:
         location = ai_service.get_face_location(base64_string.image_base64)
         if location:
-            return location 
+            return {
+                "success":True,
+                "coords":location
+            } 
         else: 
             raise HTTPException(status_code=404, detail="No se ha encontrado un rostro.")
     except HTTPException as e:
