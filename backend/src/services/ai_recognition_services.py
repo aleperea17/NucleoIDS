@@ -29,7 +29,7 @@ class AiRecognition():
         
         return encoding_array
 
-    def get_encoding_from_base64(self, image_base64: str) -> np.ndarray:
+    def base64_to_nparray(self, image_base64:str):
         # Decodificar la imagen base64
         image_data = base64.b64decode(image_base64)
 
@@ -38,15 +38,25 @@ class AiRecognition():
 
         # Convertir la imagen a un array de NumPy compatible con face_recognition
         np_image = np.array(image)
+        return np_image
 
+    def get_encoding_from_base64(self, image_base64: str) -> np.ndarray:
         # Obtener los encodings faciales de la imagen (asumiendo una sola cara)
-        encodings = face_recognition.face_encodings(np_image)
+        image = self.base64_to_nparray(image_base64)
+        encodings = face_recognition.face_encodings(image)
 
         if encodings:
             return encodings[0]  # Devolver el primer encoding encontrado
         else:
             return None  # No se encontró ninguna cara
 
+    def get_face_location(self, image_base64: str):
+        image = self.base64_to_nparray(image_base64)
+        location = face_recognition.face_locations(image)
+        if location:
+            return location[0]
+        else:
+            return None
 
     def compare_faces(self, known_students:List[np.ndarray], student_curr_encoding: np.ndarray):
         # Almacena en una variable la lista de similitud con todas las codificaciones de rostros almacenados. 
