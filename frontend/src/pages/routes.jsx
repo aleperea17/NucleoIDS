@@ -8,6 +8,7 @@ import DashboardPage from "./dashboard/dashboard";
 import TestPage from "./test-page/page";
 import TeachersPage from "./dashboard/teachers/teachers-page";
 import StudentsPage from "./dashboard/students/students-page";
+import FaceCapture from "./faceCapture";
 
 export const router = createBrowserRouter([
 	{
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
 				element: <RegisterForm />,
 			},
 		],
+	},
+	{
+		path: "/facecapture",
+		element: <FaceCapture/>,
 	},
 	{
 		path: "/dashboard",
