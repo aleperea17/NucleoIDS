@@ -62,6 +62,10 @@ export const router = createBrowserRouter([
 				path: "students",
 				element: <StudentsPage />,
 			},
+			{
+				path: "assistance",
+				element: <FaceCapture />,
+			},
 		],
 	},
 ]);
