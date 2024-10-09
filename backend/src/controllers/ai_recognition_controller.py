@@ -1,8 +1,8 @@
-from fastapi import APIRouter,HTTPException
-from ..services.ai_recognition_services import AiRecognition
-from ..services.student_services import StudentsService
+from fastapi import APIRouter, HTTPException
+from src.services.ai_recognition_services import AiRecognition
+from src.services.student_services import StudentsService
 from pony.orm import db_session
-from ...src import schemas,models
+from src import schemas, models
 
 router = APIRouter()
 
@@ -10,14 +10,18 @@ ai_service = AiRecognition()
 
 student_service = StudentsService()
 
+
 @router.post("/recognition")
 def recognition(base64_string: schemas.ImageRequest):
     with db_session:
         try:
-            dni,firstName = ai_service.find_matching_student(base64_string.image_base64)
+            dni, firstName = ai_service.find_matching_student(
+                base64_string.image_base64)
             return {f"El alumno detectado es {firstName} con DNI {dni}"}
         except:
+
             raise HTTPException(status_code=404,detail="No fue posible realizar reconocimiento.")    
+
 
 @router.post("/train")
 def create_student(student_input: schemas.Student, base64_string: schemas.ImageRequest):
@@ -58,4 +62,5 @@ def detect_face(base64_string: schemas.ImageRequest):
             "message": f'{e.detail}',
             "success": False, }
         
+
 

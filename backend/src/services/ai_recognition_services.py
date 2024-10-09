@@ -5,28 +5,30 @@ from typing import List
 from PIL import Image
 import face_recognition
 from pony.orm import select
-from ...src import models
+
+# from src.services import student_services
+from src import models
 import numpy as np
 import json
-from . import student_services
 
-student_services = student_services.StudentsService()
+# student_service = student_services.StudentsService()
+
 
 class AiRecognition():
     def __init__(self):
         pass
 
     # serializar y deserializar los datos del encoding para almacenarlos/obtenerlos de la base de datos
-    def encoding_to_json(self,encoding: np.ndarray) -> str:
+    def encoding_to_json(self, encoding: np.ndarray) -> str:
         return json.dumps(encoding.tolist())
 
     def json_to_encoding(self, json_str: str) -> np.ndarray:
         # Convertir la cadena JSON a una lista de Python
         encoding_list = json.loads(json_str)
-        
+
         # Convertir la lista a un array de NumPy
         encoding_array = np.array(encoding_list)
-        
+
         return encoding_array
 
     def base64_to_nparray(self, image_base64:str):
@@ -50,6 +52,7 @@ class AiRecognition():
         else:
             return None  # No se encontró ninguna cara
 
+
     def get_face_location(self, image_base64: str):
         image = self.base64_to_nparray(image_base64)
         location = face_recognition.face_locations(image)
@@ -61,6 +64,7 @@ class AiRecognition():
     def compare_faces(self, known_students:List[np.ndarray], student_curr_encoding: np.ndarray):
         # Almacena en una variable la lista de similitud con todas las codificaciones de rostros almacenados. 
         faceDis = face_recognition.face_distance(known_students,student_curr_encoding)
+
         # Obtener el indice de la codificacion que mas se aproxima al rostro mostrado en la camara web.
         matchIndex = np.argmin(faceDis)
         # retorna el estudiante encontrado
@@ -68,8 +72,8 @@ class AiRecognition():
 
     def get_all_encodings(self):
         return select((e.data, e.student.dni, e.student.firstName) for e in models.Encoding)[:]
-    
-    def find_matching_student(self,image_base64: str):
+
+    def find_matching_student(self, image_base64: str):
         # Obtener el encoding de la imagen
         image_encoding = self.get_encoding_from_base64(image_base64)
         if image_encoding is None:
@@ -83,7 +87,8 @@ class AiRecognition():
             encoding_array = np.array(json.loads(encoding_str))
 
             # Comparar los encodings
-            match = face_recognition.compare_faces([encoding_array], image_encoding)
+            match = face_recognition.compare_faces(
+                [encoding_array], image_encoding)
 
             if match[0]:  # Si hay una coincidencia
                 return dni, firstName
