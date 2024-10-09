@@ -12,7 +12,7 @@ export default function FaceCapture() {
   useEffect(() => {
     // Aquí debe ir la llamada al backend para obtener el taller del profesor.
     // Ejemplo: fetch('/api/workshop').then(response => response.json()).then(data => setAssignedWorkshop(data.workshop));
-    
+
     // ejemplo, simulacion para taller fijo:
     const workshop = 'Programación';
     setAssignedWorkshop(workshop);
@@ -47,26 +47,8 @@ export default function FaceCapture() {
 
             <div className="flex flex-col lg:flex-row p-4 gap-6">
               <div className="w-full lg:w-1/2">
-                // <div className="bg-base-200 aspect-video flex items-center justify-center rounded-box">
-                //   {isScanning ? (
-                //     <div className="text-center">
-                //       <Camera className="mx-auto animate-pulse text-primary" size={64} />
-                //       <p className="mt-4 text-primary font-semibold text-lg">Escaneando...</p>
-                //     </div>
-                //   ) : (
-                //     <Camera className="text-primary" size={64} />
-                //   )}
-                // </div>
-                
-                <FaceRecognition />
-                <button
-                  className="btn bg-customOrange text-white btn-block mt-4"
-                  onClick={handleScan}
-                  disabled={isScanning}
-                >
-                  {isScanning ? 'Escaneando...' : 'Iniciar Escaneo Facial'}
-                </button>
-              </div>
+
+              </div >
 
               <div className="w-full lg:w-1/2">
                 <h3 className="text-xl font-semibold mb-4 text-customOrange">Asistencia Registrada</h3>
@@ -103,11 +85,11 @@ export default function FaceCapture() {
                   </table>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </div >
+          </div >
+        </div >
+      </div >
+    </div >
   );
 }
 

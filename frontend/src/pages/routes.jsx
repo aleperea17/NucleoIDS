@@ -12,6 +12,10 @@ import FaceCapture from "./faceCapture";
 
 export const router = createBrowserRouter([
 	{
+		path: "/",
+		element: <Navigate to="/dashboard" />,
+	},
+	{
 		path: "/teacherstable",
 		element: <TeachersTable />,
 	},
@@ -37,6 +41,10 @@ export const router = createBrowserRouter([
 				element: <RegisterForm />,
 			},
 		],
+	},
+	{
+		path: "/facecapture",
+		element: <FaceCapture/>,
 	},
 	{
 		path: "/dashboard",
