@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { fetcher } from "../../fetcher/fetcher";
 
 export default function LoginForm() {
 	const [_, setToken] = useLocalStorage("token", "");
+	const [_$, setRefreshToken] = useLocalStorage("refresh_token", "");
 
 	const navigate = useNavigate();
 	const {
@@ -17,18 +18,15 @@ export default function LoginForm() {
 	} = useForm();
 
 	const onFormSubmit = async (data) => {
-		const response = await axios.post(
-			"http://localhost:8000/auth/login",
-			null,
-			{
-				params: data,
-			},
-		);
+		console.log(data);
+		const response = await fetcher.post("/auth/login", null, {
+			params: data,
+		});
 
-		console.log(response.data);
 		if (response.data.success) {
 			toast.success("Sesión iniciada con éxito", { position: "top-right" });
 			setToken(response.data.access_token);
+			setRefreshToken(response.data.refresh_token);
 			navigate("/dashboard");
 		} else {
 			toast.error("Algo salió mal!");
