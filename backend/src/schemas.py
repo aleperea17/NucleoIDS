@@ -66,3 +66,7 @@ class Student(BaseModel):
 
 class TokenVerificationRequest(BaseModel):
     token: str
+
+class CourseCreate(BaseModel):
+    course_name: str
+    
