@@ -46,17 +46,18 @@ class LoginRequest(BaseModel):
 class ImageRequest(BaseModel):
     image_base64: str
 
+class CourseCreate(BaseModel):
+    course_name: str
+    dni_teacher: str | None = None 
+    
+
 class Student(BaseModel):
     dni : str
     email : str
     firstName: str
     lastName : str
-    encoding: str
+    course: str
+
 
 class TokenVerificationRequest(BaseModel):
     token: str
-
-class CourseCreate(BaseModel):
-    course_name: str
-    dni_teacher: str | None = None 
-    

@@ -27,7 +27,7 @@ class Student(db.Entity):
     lastName = Required(str, column="lastName")
     encoding = Optional("Encoding")
     courses = Set("Course")
-    attendance = Optional("Attendance")
+    attendance = Set("Attendance")
     _table_ = "Students"
 
 class Encoding(db.Entity):

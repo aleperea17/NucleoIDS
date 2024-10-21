@@ -1,4 +1,4 @@
-from pony.orm import db_session
+from pony.orm import db_session, select
 from src import models, schemas
 from pony.orm.core import TransactionIntegrityError
 from fastapi import HTTPException
@@ -27,4 +27,16 @@ class CourseService():
                 raise HTTPException(
                     status_code=500, detail="Error al crear el curso.")
 
-
+    def get_course(self,course_name:str):
+        with db_session:
+            try:
+                course = select(c for c in models.Course if c.course_name == course_name)[:]
+                return course[0]
+            except TransactionIntegrityError as e:
+                print(f"Error de integridad transaccional: {e}")
+                raise HTTPException(
+                    status_code=400, detail="Error de integridad al obtener el curso.")
+            except Exception as e:
+                print(f"Error al crear el curso: {e}")
+                raise HTTPException(
+                    status_code=500, detail="Error al obtener el curso.")
