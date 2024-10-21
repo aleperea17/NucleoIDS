@@ -38,8 +38,8 @@ class ProfessorService:
     def get_teacher(self, dni:str):
         with db_session:
             try:
-                teacher = select(t for t in models.Teacher if t.dni == dni)
-                return teacher
+                teacher = select(t for t in models.Teacher if t.dni == dni)[:]
+                return teacher[0]
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
                 raise HTTPException(
