@@ -38,6 +38,7 @@ class Encoding(db.Entity):
 
 class Teacher(db.Entity):
     id = PrimaryKey(uuid.UUID, auto=True)
+    dni = Required(str, unique=True)
     firstName = Required(str, column="firstName")  
     lastName = Required(str, column="lastName")    
     email = Required(str, unique=True)             
