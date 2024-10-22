@@ -19,6 +19,21 @@ class BaseProfessor(BaseModel):
 class ProfessorCreate(BaseProfessor):
     pass
 
+#AGREGUE
+class ProfessorResponse(BaseProfessor):
+    id: str  # O el tipo que estés utilizando para el ID (como uuid.UUID)
+
+    class Config:
+        from_attributes = True
+
+#AGREGUE
+class TeacherResponse(BaseProfessor):
+    course_name: str | None = None  # Agregar el nombre del curso
+
+    class Config:
+        from_attributes = True
+
+
 class BaseUser(BaseModel):
     username: str
     email: str
