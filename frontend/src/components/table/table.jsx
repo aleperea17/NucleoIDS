@@ -1,81 +1,43 @@
-export default function Table({
-  columns,
-  data,
-  loading = false,
-  withCheckbox = true,
-}) {
+import fotos from "./img";
+
+const Table = ({ title, data, columns }) => {
   return (
-    <div className="overflow-x-auto shadow-lg rounded-lg">
-      <table className="table table-zebra-zebra">
+    <div className="">
+      <div className="hero">
+        <div className="max-w-md">
+          <h1 className="text-2xl font-bold">{title}</h1>
+          <br />
+        </div>
+      </div>
+
+      <table className="table">
         {/* head */}
         <thead>
           <tr>
-            {withCheckbox && (
-              <th>
-                <label>
-                  <input type="checkbox" className="checkbox" />
-                </label>
-              </th>
-            )}
             {columns.map((column, index) => (
-              <th key={index}>{column.header}</th>
+              <th key={`table-column-${index}`} className="text-xl">
+                {column.header}
+              </th>
             ))}
-            <th></th>
           </tr>
         </thead>
         <tbody>
-          {loading
-            ? Array(4)
-              .fill()
-              .map((_, i) => (
-                <tr key={i}>
-                  {withCheckbox && (
-                    <th>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="checkbox skeleton"
-                        />
-                      </label>
-                    </th>
-                  )}
-                  {columns.map((_, colIndex) => (
-                    <td key={colIndex}>
-                      <div className="skeleton w-full h-20"></div>
-                    </td>
-                  ))}
-                </tr>
-              ))
-            : data.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {withCheckbox && (
-                  <th>
-                    <label>
-                      <input type="checkbox" className="checkbox" />
-                    </label>
-                  </th>
-                )}
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex}>
-                    {column.render
-                      ? column.render(row[column.accessor], row)
-                      : row[column.accessor]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {columns.map((column, colIndex) => (
+                <td key={colIndex}>
+                  {column.render
+                    ? column.render(row[column.accessor], row)
+                    : row[column.accessor]}
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
-        {/* foot */}
-        <tfoot>
-          <tr>
-            {withCheckbox && <th></th>}
-            {columns.map((column, index) => (
-              <th key={index}>{column.header}</th>
-            ))}
-            <th></th>
-          </tr>
-        </tfoot>
+        <tfoot></tfoot>
       </table>
     </div>
   );
-}
+};
+
+export default Table;
