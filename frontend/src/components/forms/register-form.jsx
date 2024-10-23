@@ -3,6 +3,7 @@ import React from "react";
 import { Card, Input, Button } from "react-daisyui";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { fetcher } from "../../fetcher/fetcher";
 
 const RegisterForm = () => {
 	const {
@@ -13,19 +14,16 @@ const RegisterForm = () => {
 
 	const onFormSubmit = async (data) => {
 		const { confirmPassword, ...rest } = data;
-		const response = await axios.post("http://localhost:8000/auth/register", {
+		const response = await fetcher.post("/auth/register", {
 			...rest,
 			role: "STUDENT",
 		});
 
-		console.log(response);
 		if (response.data.success) {
 			toast.success("Cuenta creada con éxito", { position: "top-right" });
 		} else {
 			toast.error("Algo salió mal!", { position: "top-right" });
 		}
-
-		console.log(response_parsed);
 	};
 
 	return (

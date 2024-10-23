@@ -1,10 +1,12 @@
 import useSWR from "swr";
 import axios from "axios";
 import React from "react";
+import useLocalStorage from "./useLocalStorage";
+import { fetcher } from "../fetcher/fetcher";
 
 const getAllUsers = async (url) => {
   try {
-    const response = await axios.get(url);
+    const response = await fetcher.get(url);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -33,11 +35,10 @@ export default function useUsers(config) {
 
   console.log(import.meta.env.VITE_PUBLIC_API_URL);
   const { data, isLoading, error, mutate } = useSWR(
-    `${import.meta.env.VITE_PUBLIC_API_URL}/users/?page=${page}&count=${count}&order=asc${config && config.role ? `&role=${config.role}` : ""}`,
+    `/users/?page=${page}&count=${count}&order=asc${config && config.role ? `&role=${config.role}` : ""}`,
     getAllUsers,
   );
 
-  console.log(count, page);
   const goToNextPage = () => {
     const { total } = data;
 
@@ -55,6 +56,7 @@ export default function useUsers(config) {
   };
 
   const changeCount = (val) => setCount(val);
+
   const helpers = {
     goToPrevPage,
     goToNextPage,

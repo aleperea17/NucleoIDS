@@ -1,4 +1,4 @@
-from fastapi import HTTPException, APIRouter,status, Depends
+from fastapi import HTTPException, APIRouter, status, Depends
 from pony.orm import *
 from src import schemas
 from jose import jwt, JWTError, ExpiredSignatureError
@@ -15,12 +15,15 @@ router = APIRouter()
 service = UsersService()
 
 SECRET_KEY = config("SECRET")
-ACCESS_TOKEN_DURATION = 5
+ACCESS_TOKEN_DURATION = 1440  # 24 hs
+REFRESH_TOKEN_DURATION = 10080   # 168hs -> 1 Week
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
 
 class RegisterMessage(BaseModel):
     message: str
     success: bool
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
@@ -30,10 +33,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise HTTPException(status_code=401, detail="Token inválido")
         user = service.search_user_by_id(user_id)
         if user is None:
-            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+            raise HTTPException(
+                status_code=401, detail="Usuario no encontrado")
         return user
     except JWTError:
-        raise HTTPException(status_code=401, detail="Token inválido o expirado")
+        raise HTTPException(
+            status_code=401, detail="Token inválido o expirado")
 
 
 @router.post("/verify-token")
@@ -45,7 +50,8 @@ async def verify_token(token: str):
             raise HTTPException(status_code=401, detail="Token inválido")
         user = service.search_user_by_id(user_id)
         if user is None:
-            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+            raise HTTPException(
+                status_code=401, detail="Usuario no encontrado")
         print(user)
         return {
             "message": "Token válido",
@@ -55,7 +61,40 @@ async def verify_token(token: str):
             }
         }
     except JWTError:
-        raise HTTPException(status_code=401, detail="Token inválido o expirado")
+        raise HTTPException(
+            status_code=401, detail="Token inválido o expirado")
+
+
+@router.post("/refresh-token")
+async def refresh_token(refresh_token: str):
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("id")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+
+        # Verifica si el usuario aún existe y es válido
+        user = service.search_user_by_id(user_id)
+        if user is None:
+            raise HTTPException(
+                status_code=401, detail="Usuario no encontrado")
+
+        # Crea un nuevo token de acceso
+        new_access_token = jwt.encode(
+            {"id": str(user.id), "exp": datetime.utcnow() +
+             timedelta(minutes=ACCESS_TOKEN_DURATION)},
+            key=SECRET_KEY,
+            algorithm="HS256"
+        )
+
+        return {
+            "access_token": new_access_token,
+            "token_type": "bearer"
+        }
+    except JWTError:
+        raise HTTPException(
+            status_code=401, detail="Refresh token inválido o expirado")
+
 
 @router.post("/register", response_model=RegisterMessage, status_code=201)
 async def register(user: schemas.UserCreate):
@@ -69,7 +108,8 @@ async def register(user: schemas.UserCreate):
         # Maneja el error y devuelve un mensaje personalizado
         return {
             "message": e.detail,
-            "success": False, }
+            "success": False,
+        }
     except Exception as e:
         return {
             "message": "Error inesperado al crear el usuario.",
@@ -89,11 +129,18 @@ async def login(request: schemas.LoginRequest = Depends()):
     user = service.search_user(
         username=username, email=email, password=password)
 
-    access_token = {"id": str(user.id), "exp":datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_DURATION)}
+    access_token = {"id": str(user.id), "exp": datetime.utcnow(
+    ) + timedelta(minutes=ACCESS_TOKEN_DURATION)}
+
+    refresh_token = {
+        "id": str(user.id),
+        "exp": datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_DURATION)
+    }
 
     return {
         "message": "Usuario logeado correctamente",
         "success": True,
-        "access_token": jwt.encode(access_token,key=SECRET_KEY ,algorithm="HS256"),
-        "token_type":"bearer"
+        "access_token": jwt.encode(access_token, key=SECRET_KEY, algorithm="HS256"),
+        "refresh_token": jwt.encode(refresh_token, key=SECRET_KEY, algorithm="HS256"),
+        "token_type": "bearer"
     }
