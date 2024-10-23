@@ -71,7 +71,7 @@ class AiRecognition():
         return known_students[matchIndex]
 
     def get_all_encodings(self):
-        return select((e.data, e.student.dni, e.student.firstName) for e in models.Encoding)[:]
+        return select((e.data, e.student) for e in models.Encoding)[:]
 
     def find_matching_student(self, image_base64: str):
         # Obtener el encoding de la imagen
@@ -82,7 +82,7 @@ class AiRecognition():
         # Obtener los encodings y dni de los estudiantes desde la base de datos
         encodings = self.get_all_encodings()
 
-        for encoding_str, dni, firstName in encodings:
+        for encoding_str, student in encodings:
             # Convertir el JSON encoding a numpy array
             encoding_array = np.array(json.loads(encoding_str))
 
@@ -91,6 +91,6 @@ class AiRecognition():
                 [encoding_array], image_encoding)
 
             if match[0]:  # Si hay una coincidencia
-                return dni, firstName
+                return student
 
         return None  # No se encontró ninguna coincidencia

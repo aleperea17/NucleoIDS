@@ -84,7 +84,7 @@ class StudentCreateRequest(BaseModel):
 @router.post("/student")
 @db_session
 def create_student(student_request: StudentCreateRequest):
-    # Check if student with same dni already exists
+    # Comprobar si ya existe un estudiante con ese DNI
     if Student.get(dni=student_request.dni):
         raise HTTPException(
             status_code=400, detail="Student with this DNI already exists")

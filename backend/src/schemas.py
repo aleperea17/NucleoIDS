@@ -4,13 +4,13 @@ from src.models import Roles
 from datetime import date
 
 class BaseProfessor(BaseModel):
+    dni: str
     firstName: str
     lastName: str 
     email: str
     phone: str 
     address: str
     hire_date: date
-    course: str
 
     class Config:
         from_attributes = True
@@ -18,15 +18,6 @@ class BaseProfessor(BaseModel):
 # Esquema para crear un nuevo profesor
 class ProfessorCreate(BaseProfessor):
     pass
-
-# Esquema para la respuesta
-
-class ProfessorResponse(BaseProfessor):
-    id: str  # El ID es un UUID generado por la base de datos
-    class Config:
-        from_attributes = True
-
-
 
 class BaseUser(BaseModel):
     username: str
@@ -40,12 +31,10 @@ class BaseUser(BaseModel):
         from_attributes = True
         use_enum_values = True
 
-
 class UserCreate(BaseUser):
     password: str
 
 # Modelo de entrada
-
 
 class LoginRequest(BaseModel):
     username: str | None = None
@@ -57,12 +46,18 @@ class LoginRequest(BaseModel):
 class ImageRequest(BaseModel):
     image_base64: str
 
+class CourseCreate(BaseModel):
+    course_name: str
+    dni_teacher: str | None = None 
+    
+
 class Student(BaseModel):
     dni : str
     email : str
     firstName: str
     lastName : str
-    encoding: str
+    course: str
+
 
 class TokenVerificationRequest(BaseModel):
     token: str
