@@ -2,6 +2,7 @@ export default function Table({
   columns,
   data,
   loading = false,
+  onRowClick, // Añadir el prop onRowClick para manejar los clics en las filas
 }) {
   return (
     <div className="overflow-x-auto shadow-lg rounded-lg">
@@ -29,7 +30,11 @@ export default function Table({
                   </tr>
                 ))
             : data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
+                <tr
+                  key={rowIndex}
+                  className="cursor-pointer hover:bg-gray-200" // Añadir estilos para hacer la fila clickeable
+                  onClick={() => onRowClick(row)} // Llamar a onRowClick cuando se haga clic en la fila
+                >
                   {columns.map((column, colIndex) => (
                     <td key={colIndex}>
                       {column.render
@@ -53,3 +58,4 @@ export default function Table({
     </div>
   );
 }
+

@@ -54,7 +54,7 @@ export default function StudentsManagement() {
 
   return (
     <div className="p-6 bg-base-200 min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-8 text-customOrange">Gestión de Alumnos</h1>
+      <h1 className="text-3xl font-bold text-center mb-8 text-customOrangenom ">Gestión de Alumnos</h1>
 
       <div className="card shadow-lg p-6 bg-base-100">
         <h2 className="text-xl font-bold mb-4">Lista de Alumnos</h2>
@@ -81,7 +81,7 @@ export default function StudentsManagement() {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Nombre"
-                className="input input-bordered"
+                className="input input-bordered input-sm"
                 disabled={!selectedStudent} // Deshabilitar si no hay alumno seleccionado
               />
             </div>
@@ -95,7 +95,7 @@ export default function StudentsManagement() {
                 value={formData.address}
                 onChange={handleInputChange}
                 placeholder="Correo electrónico"
-                className="input input-bordered"
+                className="input input-bordered input-sm"
                 disabled={!selectedStudent}
               />
             </div>
@@ -109,13 +109,13 @@ export default function StudentsManagement() {
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Teléfono"
-                className="input input-bordered"
+                className="input input-bordered input-sm"
                 disabled={!selectedStudent}
               />
             </div>
           </div>
           <button
-            className="btn btn-primary mt-6"
+            className="btn btn-primary mt-6 btn-sm"
             disabled={!selectedStudent} // Deshabilitar el botón si no hay un alumno seleccionado
           >
             Guardar Cambios
