@@ -9,6 +9,8 @@ import TestPage from "./test-page/page";
 import TeachersPage from "./dashboard/teachers/teachers-page";
 import StudentsPage from "./dashboard/students/students-page";
 import FaceCapture from "./faceCapture";
+import ModifyStudent from "../components/table/ModifyStudent";
+import AttHistory from "../components/table/AttHistory";
 
 export const router = createBrowserRouter([
 	{
@@ -22,6 +24,16 @@ export const router = createBrowserRouter([
 	{
 		path: "/studenttable",
 		element: <StudentTable />,
+	},
+	{
+		path: "/modifystudent",
+		element: <ModifyStudent/>,
+
+	},
+	{
+		path: "/atthistory",
+		element: <AttHistory/>,
+
 	},
 	{
 		path: "/auth",
