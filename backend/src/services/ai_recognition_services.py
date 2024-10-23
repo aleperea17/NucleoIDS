@@ -4,23 +4,22 @@ from io import BytesIO
 from typing import List
 from PIL import Image
 import face_recognition
-from pony.orm import select
-
-# from src.services import student_services
+from pony.orm import select, db_session, TransactionIntegrityError
 from src import models
 import numpy as np
 import json
+from src.services.student_services import StudentsService
 
-# student_service = student_services.StudentsService()
-
+student_service = StudentsService()
 
 class AiRecognition():
     def __init__(self):
         pass
 
-    # serializar y deserializar los datos del encoding para almacenarlos/obtenerlos de la base de datos
+    # Serializar y deserializar los datos del encoding para almacenarlos/obtenerlos de la base de datos
     def encoding_to_json(self, encoding: np.ndarray) -> str:
         return json.dumps(encoding.tolist())
+
 
     def json_to_encoding(self, json_str: str) -> np.ndarray:
         # Convertir la cadena JSON a una lista de Python
@@ -30,6 +29,7 @@ class AiRecognition():
         encoding_array = np.array(encoding_list)
 
         return encoding_array
+
 
     def base64_to_nparray(self, image_base64:str):
         # Decodificar la imagen base64
@@ -41,6 +41,7 @@ class AiRecognition():
         # Convertir la imagen a un array de NumPy compatible con face_recognition
         np_image = np.array(image)
         return np_image
+
 
     def get_encoding_from_base64(self, image_base64: str) -> np.ndarray:
         # Obtener los encodings faciales de la imagen (asumiendo una sola cara)
@@ -67,30 +68,59 @@ class AiRecognition():
 
         # Obtener el indice de la codificacion que mas se aproxima al rostro mostrado en la camara web.
         matchIndex = np.argmin(faceDis)
+        
         # retorna el estudiante encontrado
         return known_students[matchIndex]
 
+
     def get_all_encodings(self):
-        return select((e.data, e.student.dni, e.student.firstName) for e in models.Encoding)[:]
+        try:
+            return select((e.data, e.student) for e in models.Encoding)[:]
+        except TransactionIntegrityError as e:
+            print(f"Error de integridad transaccional: {e}")
+
+
+    def create_encoding(self, image_base64:str):
+        with db_session:
+            try:
+                # Crear el objeto Encoding
+                encoding_input = self.get_encoding_from_base64(
+                    image_base64)
+                if encoding_input is None or len(encoding_input) == 0:
+                    raise ValueError("Encoding nulo o inexistente.")
+                encoding = models.Encoding(data=self.encoding_to_json(encoding_input))
+                return encoding
+            except TransactionIntegrityError as e:
+                print(f"Error de integridad transaccional: {e}")
+    
+
+    def assign_encoding(self, encoding_id, student_id):
+        with db_session:
+            try:
+                student = student_service.get_student(student_id)
+                encoding = select(e for e in models.Encoding if e.id == encoding_id)[:][0]
+                student.encoding = encoding
+            except TransactionIntegrityError as e:
+                print(f"Error de integridad transaccional: {e}")
+        
 
     def find_matching_student(self, image_base64: str):
-        # Obtener el encoding de la imagen
-        image_encoding = self.get_encoding_from_base64(image_base64)
-        if image_encoding is None:
-            return None  # No se encontró ninguna cara en la imagen
-
-        # Obtener los encodings y dni de los estudiantes desde la base de datos
-        encodings = self.get_all_encodings()
-
-        for encoding_str, dni, firstName in encodings:
-            # Convertir el JSON encoding a numpy array
-            encoding_array = np.array(json.loads(encoding_str))
-
-            # Comparar los encodings
-            match = face_recognition.compare_faces(
-                [encoding_array], image_encoding)
-
-            if match[0]:  # Si hay una coincidencia
-                return dni, firstName
-
-        return None  # No se encontró ninguna coincidencia
+        with db_session:
+            try:
+                # Obtener el encoding de la imagen
+                image_encoding = self.get_encoding_from_base64(image_base64)
+                if image_encoding is None:
+                    return None  # No se encontró ninguna cara en la imagen
+                # Obtener los encodings y  estudiantes desde la base de datos
+                encodings = self.get_all_encodings()
+                for encoding_str, student in encodings:
+                    # Convertir el JSON encoding a numpy array
+                    encoding_array = np.array(json.loads(encoding_str))
+                    # Comparar los encodings
+                    match = face_recognition.compare_faces(
+                        [encoding_array], image_encoding)
+                    if match[0]:  # Si hay una coincidencia
+                        return student.id
+                return None  # No se encontró ninguna coincidencia
+            except TransactionIntegrityError as e:
+                print(f"Error de integridad transaccional: {e}")

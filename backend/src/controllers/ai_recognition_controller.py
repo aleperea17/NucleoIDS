@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from src.services.ai_recognition_services import AiRecognition
 from src.services.student_services import StudentsService
+from src.services.courses_services import CourseService
+from src.services.attendance_service import AttendanceService
 from pony.orm import db_session
 from src import schemas, models
 
@@ -10,48 +12,61 @@ ai_service = AiRecognition()
 
 student_service = StudentsService()
 
+course_service = CourseService()
+
+attendance_service = AttendanceService()
+
 
 @router.post("/recognition")
 def recognition(base64_string: schemas.ImageRequest):
-    with db_session:
-        try:
-            dni, firstName = ai_service.find_matching_student(
-                base64_string.image_base64)
-            return {f"El alumno detectado es {firstName} con DNI {dni}"}
-        except:
+    try:
+        student = ai_service.find_matching_student(
+            base64_string.image_base64)
+        return {f"El alumno reconocido es {student.firstName} con DNI {student.dni}"}
+    except:
+        raise HTTPException(
+            status_code=404, detail="No fue posible realizar reconocimiento.")
 
+
+@router.post("/mark-attendance")
+def mark_attendance(course_id:str,  base64_string: schemas.ImageRequest):
+    try:
+        student_id = ai_service.find_matching_student(
+            base64_string.image_base64)
+        attendance = attendance_service.markAttendance(course_id,student_id)
+        return {
+            "message": f'Se ha registrado la asistencia del estudiante correctamente. ',
+            "success": True
+            }
+    
+    except:
             raise HTTPException(
                 status_code=404, detail="No fue posible realizar reconocimiento.")
 
 
 @router.post("/train")
-def create_student(student_input: schemas.Student, base64_string: schemas.ImageRequest):
-    with db_session:
-        try:
-            # Crear el objeto Encoding
-            encoding_input = ai_service.get_encoding_from_base64(
-                base64_string.image_base64)
-            print(encoding_input)
-            if encoding_input is None or len(encoding_input) == 0:
-                raise HTTPException(
-                    status_code=404, detail="No se ha encontrado un rostro.")
-            encoding = models.Encoding(
-                data=ai_service.encoding_to_json(encoding_input))
+def add_student(student_input: schemas.Student, base64_string: schemas.ImageRequest):
+    try:
+        encoding = ai_service.create_encoding(base64_string.image_base64)
 
-            # Crear el objeto Student y asignar el encoding
-            student = models.Student(
-                dni=student_input.dni,
-                email=student_input.email,
-                firstName=student_input.firstName,
-                lastName=student_input.lastName,
-                encoding=encoding
-            )
+        # Crear el objeto Student y asignar el encoding y el curso
+        student = student_service.create_student(student_input)
 
-            return {"Usuario creado con exito"}
-        except HTTPException as e:
-            return {
-                "message": f'{e.detail}',
-                "success": False, }
+        if not student:
+            raise HTTPException(status_code=404, detail="No fue posible crear el estudiante.") 
+        
+        # Asignar el encoding al estudiante creado
+        ai_service.assign_encoding(encoding.id,student.id)
+
+        # Asignar el curso al estudiante 
+        course_service.assign_course_to_student(student_input.course,student.id)
+
+        return {"Estudiante agregado con exito a la base de datos."}
+    
+    except HTTPException as e:
+        return {
+            "message": f'{e.detail}',
+            "success": False, }
 
 
 @router.post("/detectFace")
