@@ -15,8 +15,8 @@ router = APIRouter()
 service = UsersService()
 
 SECRET_KEY = config("SECRET")
-ACCESS_TOKEN_DURATION = 5
-REFRESH_TOKEN_DURATION = 60
+ACCESS_TOKEN_DURATION = 1440  # 24 hs
+REFRESH_TOKEN_DURATION = 10080   # 168hs -> 1 Week
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -64,6 +64,7 @@ async def verify_token(token: str):
         raise HTTPException(
             status_code=401, detail="Token inválido o expirado")
 
+
 @router.post("/refresh-token")
 async def refresh_token(refresh_token: str):
     try:
@@ -75,11 +76,13 @@ async def refresh_token(refresh_token: str):
         # Verifica si el usuario aún existe y es válido
         user = service.search_user_by_id(user_id)
         if user is None:
-            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+            raise HTTPException(
+                status_code=401, detail="Usuario no encontrado")
 
         # Crea un nuevo token de acceso
         new_access_token = jwt.encode(
-            {"id": str(user.id), "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_DURATION)},
+            {"id": str(user.id), "exp": datetime.utcnow() +
+             timedelta(minutes=ACCESS_TOKEN_DURATION)},
             key=SECRET_KEY,
             algorithm="HS256"
         )
@@ -89,7 +92,9 @@ async def refresh_token(refresh_token: str):
             "token_type": "bearer"
         }
     except JWTError:
-        raise HTTPException(status_code=401, detail="Refresh token inválido o expirado")
+        raise HTTPException(
+            status_code=401, detail="Refresh token inválido o expirado")
+
 
 @router.post("/register", response_model=RegisterMessage, status_code=201)
 async def register(user: schemas.UserCreate):
@@ -128,9 +133,9 @@ async def login(request: schemas.LoginRequest = Depends()):
     ) + timedelta(minutes=ACCESS_TOKEN_DURATION)}
 
     refresh_token = {
-            "id": str(user.id),
-            "exp": datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_DURATION)
-        }
+        "id": str(user.id),
+        "exp": datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_DURATION)
+    }
 
     return {
         "message": "Usuario logeado correctamente",
