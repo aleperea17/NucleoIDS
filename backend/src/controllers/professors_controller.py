@@ -51,7 +51,6 @@ def register_professor(professor: schemas.ProfessorCreate):
 
 #AGREGUE
 
-@router.get("/{dni}", response_model=ProfessorResponse)
 @router.get("/{dni}", response_model=TeacherResponse)
 def get_professor(dni: str):
     try:
@@ -68,13 +67,23 @@ def get_professor(dni: str):
             "success": False,
         }
 
-@router.delete("/profesores/{dni}")
+@router.delete("/{dni}")
 async def delete_professor(dni: str):
     try:
         teacher = service.delete_teacher(dni)
         return teacher
     except HTTPException as e:
         raise e
+
+@router.put("/{dni}", response_model=TeacherResponse)
+def update_professor(dni: str, professor: schemas.BaseProfessor):
+    try:
+        updated_teacher = service.update_teacher(dni, professor)
+        return updated_teacher
+    except HTTPException as e:
+        raise e  # Lanza el HTTPException para que FastAPI maneje la respuesta automáticamente
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error inesperado al actualizar el profesor.")
 
 
 

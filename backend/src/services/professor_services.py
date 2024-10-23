@@ -35,7 +35,7 @@ class ProfessorService:
                 raise HTTPException(
                     status_code=500, detail="Error al crear el profesor.")
             
-    #AGREGUE
+    #Agregue
     def get_teacher(self, dni: str):
         with db_session:
             try:
@@ -60,7 +60,7 @@ class ProfessorService:
                 print(f"Error al obtener el profesor: {e}")
                 raise HTTPException(status_code=500, detail="Error al obtener el profesor.")
     
-    #AGREGUE
+    #Agregue
     def delete_teacher(self, dni: str) -> dict:
         with db_session:
             try:
@@ -74,6 +74,36 @@ class ProfessorService:
             except Exception as e:
                 print(f"Error al eliminar el profesor: {e}")
                 raise HTTPException(status_code=500, detail="Error al eliminar el profesor.")
+            
+    #Agregue       
+    def update_teacher(self, dni: str, professor_data: schemas.BaseProfessor) -> dict:
+        with db_session:
+            try:
+                # Buscar el profesor por DNI
+                print(f"DNI que se busca: {dni}")
+                teacher = models.Teacher.get(dni=dni)  # Usar get para evitar problemas con select
+
+                if not teacher:
+                    raise HTTPException(status_code=404, detail="Profesor no encontrado.")
+
+                # Actualizar los atributos del profesor
+                teacher.firstName = professor_data.firstName
+                teacher.lastName = professor_data.lastName
+                teacher.email = professor_data.email
+                teacher.phone = professor_data.phone
+                teacher.address = professor_data.address
+                teacher.hire_date = professor_data.hire_date
+
+                print("Profesor actualizado correctamente.")
+                return teacher.to_dict(exclude=['id'])  # Retorna los datos del profesor actualizado
+
+            except HTTPException as e:
+                raise e
+            except Exception as e:
+                print(f"Error al actualizar el profesor: {e}")
+                import traceback
+                print(traceback.format_exc())  # Imprimir la traza del error
+                raise HTTPException(status_code=500, detail=f"Error al actualizar el profesor: {str(e)}")
     
     
 
