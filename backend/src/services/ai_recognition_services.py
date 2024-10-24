@@ -118,9 +118,9 @@ class AiRecognition():
                     encoding_array = np.array(json.loads(encoding_str))
                     # Comparar los encodings
                     match = face_recognition.compare_faces(
-                        [encoding_array], image_encoding)
+                        [encoding_array], image_encoding,tolerance=0.4)
                     if match[0]:  # Si hay una coincidencia
-                        return student.id
+                        return student.to_dict()
                 return None  # No se encontró ninguna coincidencia
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")

@@ -5,7 +5,11 @@ from uuid import UUID
 import bcrypt
 from pony.orm.core import TransactionIntegrityError
 from src import models, schemas
+from src.services.professor_services import ProfessorService
+from src.services.courses_services import CourseService
 
+professor_service = ProfessorService()
+course_service = CourseService()
 
 class UsersService:
     def __init__(self):
@@ -23,8 +27,7 @@ class UsersService:
                     role=user.role,
                 )
                 print("Usuario creado correctamente.")
-                user_dict = usuario.to_dict(exclude=['id'])
-                return user_dict
+                return usuario.to_dict()
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
                 raise HTTPException(
@@ -70,6 +73,45 @@ class UsersService:
             "total": total,
             "users": users_conversion,
         }
+
+
+# class User(db.Entity):
+#     id = PrimaryKey(uuid.UUID, auto=True)
+#     username = Required(str)
+#     email = Required(str)
+#     password = Required(str)
+#     firstName = Required(str, column="firstName")
+#     lastName = Required(str, column="lastName")
+#     teacher = Optional("Teacher")
+#     role = Required(str)
+#     _table_ = "Users"
+
+
+    def create_user_teacher(self,user_input: schemas.UserProfessor, course_name:str):
+        with db_session:
+            try:
+                course = course_service.get_course(course_name)
+                professor = models.Teacher(
+                    dni=user_input.dni,
+                    phone=user_input.phone,
+                    address=user_input.address,
+                    hire_date=user_input.hire_date,
+                    course=course
+                )
+                user = models.User(
+                    username=user_input.username,
+                    email=user_input.email,
+                    password=user_input.password,
+                    firstName=user_input.firstName,
+                    lastName=user_input.lastName,
+                    role=user_input.role,
+                    teacher=professor)
+                professor.user = user
+                return {"Se ha creado el usuario de profesor.":user.id , "success":True}
+            except:
+                return{"detail":"No se ha podido crear el usuario.",
+                       "success": False }
+            
 
     def search_user_by_id(self, user_id: str):
         with db_session:

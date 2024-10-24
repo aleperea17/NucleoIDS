@@ -16,32 +16,45 @@ course_service = CourseService()
 
 attendance_service = AttendanceService()
 
+courses = ["Programación","Diseño y Multimedia","Impresión 3D"]
+
 
 @router.post("/recognition")
 def recognition(base64_string: schemas.ImageRequest):
     try:
         student = ai_service.find_matching_student(
             base64_string.image_base64)
-        return {f"El alumno reconocido es {student.firstName} con DNI {student.dni}"}
-    except:
+        if not student:
+            raise HTTPException(status_code=404, detail="Estudiante no registrado en la base de datos.")
+        return {"El alumno reconocido es {} con DNI {}".format(student["firstName"],student["dni"])}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Error inesperado: {str(e)}")
         raise HTTPException(
-            status_code=404, detail="No fue posible realizar reconocimiento.")
+            status_code=500, detail="No fue posible reconocer el rostro.")
 
 
 @router.post("/mark-attendance")
 def mark_attendance(course_id:str,  base64_string: schemas.ImageRequest):
     try:
-        student_id = ai_service.find_matching_student(
+        student = ai_service.find_matching_student(
             base64_string.image_base64)
-        attendance = attendance_service.markAttendance(course_id,student_id)
+        if student == None:
+            raise HTTPException(status_code=404, detail="Estudiante no registrado en la base de datos.")
+        attendance = attendance_service.markAttendance(course_id,student["id"])
         return {
-            "message": f'Se ha registrado la asistencia del estudiante correctamente. ',
+            "message": 'Se ha registrado la asistencia del estudiante {},{} correctamente. '.format(student["lastName"],student["firstName"]),
             "success": True
             }
-    
-    except:
-            raise HTTPException(
-                status_code=404, detail="No fue posible realizar reconocimiento.")
+    except HTTPException as e:
+        raise {
+            "message": f'{e.detail}',
+            "success": False, }
+    except Exception as e:
+        print(f"Error inesperado: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail="No fue posible marcar la asistencia.")
 
 
 @router.post("/train")
@@ -67,6 +80,12 @@ def add_student(student_input: schemas.Student, base64_string: schemas.ImageRequ
         return {
             "message": f'{e.detail}',
             "success": False, }
+    
+    except Exception as e:
+        print(f"Error inesperado: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail="No fue posible registrar al alumno en la base de datos")
+
 
 
 @router.post("/detectFace")

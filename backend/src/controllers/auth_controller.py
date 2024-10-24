@@ -76,6 +76,17 @@ async def register(user: schemas.UserCreate):
             "success": False,
         }
 
+@router.post("/register-user-professor", status_code=201)
+def register(user: schemas.UserProfessor, course_name:str):
+    try:
+        user_created = service.create_user_teacher(user,course_name)
+        return {"detail":"Usuario y profesor creado con éxito.","success":True}
+    except HTTPException as e:
+        return {
+            "message": e.detail,
+            "success": False, }
+
+
 
 @router.post("/login")
 async def login(request: schemas.LoginRequest = Depends()):
