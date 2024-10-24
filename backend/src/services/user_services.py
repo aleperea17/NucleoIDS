@@ -4,8 +4,12 @@ from typing import Optional
 from uuid import UUID
 import bcrypt
 from pony.orm.core import TransactionIntegrityError
-from ...src import models, schemas
+from src import models, schemas
+from src.services.professor_services import ProfessorService
+from src.services.courses_services import CourseService
 
+professor_service = ProfessorService()
+course_service = CourseService()
 
 class UsersService:
     def __init__(self):
@@ -23,8 +27,7 @@ class UsersService:
                     role=user.role,
                 )
                 print("Usuario creado correctamente.")
-                user_dict = usuario.to_dict(exclude=['id'])
-                return user_dict
+                return usuario.to_dict()
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
                 raise HTTPException(
@@ -70,6 +73,41 @@ class UsersService:
             "total": total,
             "users": users_conversion,
         }
+
+    def create_user_teacher(self,user_input: schemas.UserProfessor, course_name:str):
+        with db_session:
+            try:
+                course = course_service.get_course(course_name)
+                
+                existing_professor = models.Teacher.get(dni=user_input.dni)
+                if existing_professor:
+                    raise HTTPException(status_code=400, detail=f"Ya existe un profesor con el DNI {user_input.dni}.")
+                
+                existing_user = models.User.get(username=user_input.username) or models.User.get(email=user_input.email)
+                if existing_user:
+                    raise HTTPException(status_code=400, detail=f"Ya existe el usuario con username: {user_input.username}.")
+                                
+                professor = models.Teacher(
+                    dni=user_input.dni,
+                    phone=user_input.phone,
+                    address=user_input.address,
+                    hire_date=user_input.hire_date,
+                    course=course
+                )
+                user = models.User(
+                    username=user_input.username,
+                    email=user_input.email,
+                    password=self.hash_password(user_input.password),
+                    firstName=user_input.firstName,
+                    lastName=user_input.lastName,
+                    role=user_input.role,
+                    teacher=professor)
+                
+                professor.user = user
+                
+                return {"Se ha creado el usuario de profesor.":user.id , "success":True}
+            except Exception as e:
+                raise e
 
     def search_user_by_id(self, user_id: str):
         with db_session:

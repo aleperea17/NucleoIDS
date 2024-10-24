@@ -1,13 +1,15 @@
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .src.db import db
+from src.db import db
 from pony.orm import *
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .src.controllers.auth_controller import router as auth_router
-from .src.controllers.users_controller import router as users_router
-from .src.controllers.ai_recognition_controller import router as ai_router
+from src.controllers.auth_controller import router as auth_router
+from src.controllers.users_controller import router as users_router
+from src.controllers.ai_recognition_controller import router as ai_router
+from src.controllers.courses_controller import router as courses_router
+from src.controllers.professors_controller import router as professors_router
 
 app = FastAPI()
 
@@ -25,16 +27,23 @@ app.add_middleware(
 
 # Lista de Rutas
 
+#Talleres
+app.include_router(courses_router, prefix="/courses", tags=["talleres"]) 
+
 # Auth
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 # Usuarios
 app.include_router(users_router, prefix="/users", tags=["usuarios"])
 
+app.include_router(ai_router, prefix="/students", tags=["estudiantes"])
 
-app.include_router(ai_router, prefix="/students",tags=["estudiantes"])
+# Profesores
+app.include_router(professors_router, prefix="/profesores", tags=["profesores"]) 
 
 # Personalizar el esquema de seguridad en OpenAPI para usar Bearer tokens
+
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -51,6 +60,7 @@ def custom_openapi():
             method["security"] = [{"BearerAuth": []}]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
+
 
 # Guardamos la referencia original del método openapi
 app._original_openapi = app.openapi

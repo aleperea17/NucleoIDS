@@ -7,7 +7,11 @@ export default {
 		"node_modules/react-daisyui/dist/**/*.js",
 	],
 	theme: {
-		extend: {},
+		extend: {
+			colors: {
+				customOrange: '#d4430c', 
+			},
+		},
 	},
 	daisyui: {
 		themes: ["nucleo"],

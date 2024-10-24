@@ -1,8 +1,8 @@
 from fastapi import HTTPException, APIRouter,status, Depends
 from pony.orm import *
-from ...src import schemas
+from src import schemas
 from jose import jwt, JWTError, ExpiredSignatureError
-from ...src.services.user_services import UsersService
+from src.services.user_services import UsersService
 from pydantic import BaseModel
 from decouple import config
 from fastapi.security import OAuth2PasswordBearer
@@ -75,6 +75,16 @@ async def register(user: schemas.UserCreate):
             "message": "Error inesperado al crear el usuario.",
             "success": False,
         }
+
+@router.post("/register-user-professor", status_code=201)
+def register(user: schemas.UserProfessor, course_name:str):
+    try:
+        user_created = service.create_user_teacher(user,course_name)
+        return {"detail":"Usuario y profesor creado con éxito.","success":True}
+    except HTTPException as e:
+        return {
+            "message": e.detail,
+            "success": False, }
 
 
 @router.post("/login")

@@ -1,6 +1,20 @@
 from pydantic import BaseModel
 from typing import List
-from ..src.models import Roles
+from src.models import Roles
+from datetime import date
+
+class BaseProfessor(BaseModel):
+    dni: str
+    phone: str 
+    address: str
+    hire_date: date
+
+    class Config:
+        from_attributes = True
+
+# Esquema para crear un nuevo profesor
+class ProfessorCreate(BaseProfessor):
+    pass
 
 
 class BaseUser(BaseModel):
@@ -15,13 +29,13 @@ class BaseUser(BaseModel):
         from_attributes = True
         use_enum_values = True
 
-
 class UserCreate(BaseUser):
     password: str
 
+class UserProfessor(UserCreate, BaseProfessor):
+    pass
+
 # Modelo de entrada
-
-
 class LoginRequest(BaseModel):
     username: str | None = None
     email: str | None = None
@@ -32,12 +46,18 @@ class LoginRequest(BaseModel):
 class ImageRequest(BaseModel):
     image_base64: str
 
+class CourseCreate(BaseModel):
+    course_name: str
+    dni_teacher: str | None = None 
+    
+
 class Student(BaseModel):
     dni : str
     email : str
     firstName: str
     lastName : str
-    encoding: str
+    course: str
+
 
 class TokenVerificationRequest(BaseModel):
     token: str
