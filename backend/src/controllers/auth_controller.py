@@ -87,7 +87,6 @@ def register(user: schemas.UserProfessor, course_name:str):
             "success": False, }
 
 
-
 @router.post("/login")
 async def login(request: schemas.LoginRequest = Depends()):
     username = request.username

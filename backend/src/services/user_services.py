@@ -74,23 +74,19 @@ class UsersService:
             "users": users_conversion,
         }
 
-
-# class User(db.Entity):
-#     id = PrimaryKey(uuid.UUID, auto=True)
-#     username = Required(str)
-#     email = Required(str)
-#     password = Required(str)
-#     firstName = Required(str, column="firstName")
-#     lastName = Required(str, column="lastName")
-#     teacher = Optional("Teacher")
-#     role = Required(str)
-#     _table_ = "Users"
-
-
     def create_user_teacher(self,user_input: schemas.UserProfessor, course_name:str):
         with db_session:
             try:
                 course = course_service.get_course(course_name)
+                
+                existing_professor = models.Teacher.get(dni=user_input.dni)
+                if existing_professor:
+                    raise HTTPException(status_code=400, detail=f"Ya existe un profesor con el DNI {user_input.dni}.")
+                
+                existing_user = models.User.get(username=user_input.username) or models.User.get(email=user_input.email)
+                if existing_user:
+                    raise HTTPException(status_code=400, detail=f"Ya existe el usuario con username: {user_input.username}.")
+                                
                 professor = models.Teacher(
                     dni=user_input.dni,
                     phone=user_input.phone,
@@ -101,17 +97,17 @@ class UsersService:
                 user = models.User(
                     username=user_input.username,
                     email=user_input.email,
-                    password=user_input.password,
+                    password=self.hash_password(user_input.password),
                     firstName=user_input.firstName,
                     lastName=user_input.lastName,
                     role=user_input.role,
                     teacher=professor)
+                
                 professor.user = user
+                
                 return {"Se ha creado el usuario de profesor.":user.id , "success":True}
-            except:
-                return{"detail":"No se ha podido crear el usuario.",
-                       "success": False }
-            
+            except Exception as e:
+                raise e
 
     def search_user_by_id(self, user_id: str):
         with db_session:
