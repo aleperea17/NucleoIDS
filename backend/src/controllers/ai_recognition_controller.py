@@ -42,7 +42,8 @@ def mark_attendance(course_id:str,  base64_string: schemas.ImageRequest):
             base64_string.image_base64)
         if student == None:
             raise HTTPException(status_code=404, detail="Estudiante no registrado en la base de datos.")
-        attendance = attendance_service.markAttendance(course_id,student["id"])
+        attendance = attendance_service.markAttendance(course_id,student["dni"])
+        print(attendance)
         return {
             "message": 'Se ha registrado la asistencia del estudiante {},{} correctamente. '.format(student["lastName"],student["firstName"]),
             "success": True
@@ -60,6 +61,9 @@ def mark_attendance(course_id:str,  base64_string: schemas.ImageRequest):
 @router.post("/train")
 def add_student(student_input: schemas.Student, base64_string: schemas.ImageRequest):
     try:
+        check_student = student_service.get_student(student_input.dni)
+        if check_student:
+            raise HTTPException(status_code=409,detail="Estudiante ya existente en la base de datos.")
         encoding = ai_service.create_encoding(base64_string.image_base64)
 
         # Crear el objeto Student y asignar el encoding y el curso
@@ -69,10 +73,10 @@ def add_student(student_input: schemas.Student, base64_string: schemas.ImageRequ
             raise HTTPException(status_code=404, detail="No fue posible crear el estudiante.") 
         
         # Asignar el encoding al estudiante creado
-        ai_service.assign_encoding(encoding.id,student.id)
+        ai_service.assign_encoding(encoding.id,student.dni)
 
         # Asignar el curso al estudiante 
-        course_service.assign_course_to_student(student_input.course,student.id)
+        course_service.assign_course_to_student(student_input.course,student.dni)
 
         return {"Estudiante agregado con exito a la base de datos."}
     
@@ -85,7 +89,6 @@ def add_student(student_input: schemas.Student, base64_string: schemas.ImageRequ
         print(f"Error inesperado: {str(e)}")
         raise HTTPException(
             status_code=500, detail="No fue posible registrar al alumno en la base de datos")
-
 
 
 @router.post("/detectFace")

@@ -94,10 +94,10 @@ class AiRecognition():
                 print(f"Error de integridad transaccional: {e}")
     
 
-    def assign_encoding(self, encoding_id, student_id):
+    def assign_encoding(self, encoding_id, student_dni):
         with db_session:
             try:
-                student = student_service.get_student(student_id)
+                student = student_service.get_student(student_dni)
                 encoding = select(e for e in models.Encoding if e.id == encoding_id)[:][0]
                 student.encoding = encoding
             except TransactionIntegrityError as e:
@@ -118,8 +118,9 @@ class AiRecognition():
                     encoding_array = np.array(json.loads(encoding_str))
                     # Comparar los encodings
                     match = face_recognition.compare_faces(
-                        [encoding_array], image_encoding,tolerance=0.4)
+                        [encoding_array], image_encoding,tolerance=0.5)
                     if match[0]:  # Si hay una coincidencia
+                        print(f"Estudiante encontrado: {student}")
                         return student.to_dict()
                 return None  # No se encontró ninguna coincidencia
             except TransactionIntegrityError as e:
