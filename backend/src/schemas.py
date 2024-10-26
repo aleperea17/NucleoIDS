@@ -5,9 +5,6 @@ from datetime import date
 
 class BaseProfessor(BaseModel):
     dni: str
-    firstName: str
-    lastName: str 
-    email: str
     phone: str 
     address: str
     hire_date: date
@@ -18,6 +15,7 @@ class BaseProfessor(BaseModel):
 # Esquema para crear un nuevo profesor
 class ProfessorCreate(BaseProfessor):
     pass
+
 
 class BaseUser(BaseModel):
     username: str
@@ -34,8 +32,10 @@ class BaseUser(BaseModel):
 class UserCreate(BaseUser):
     password: str
 
-# Modelo de entrada
+class UserProfessor(UserCreate, BaseProfessor):
+    pass
 
+# Modelo de entrada
 class LoginRequest(BaseModel):
     username: str | None = None
     email: str | None = None
