@@ -14,9 +14,6 @@ class ProfessorService:
                 # Crear el profesor en la base de datos
                 teacher = models.Teacher(
                     dni=professor_data.dni,
-                    firstName=professor_data.firstName,
-                    lastName=professor_data.lastName,
-                    email=professor_data.email,
                     phone=professor_data.phone,
                     address=professor_data.address,
                     hire_date=professor_data.hire_date,
