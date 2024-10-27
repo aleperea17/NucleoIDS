@@ -68,10 +68,10 @@ export const Navbar = () => {
               className="text-error"
               onClick={() => {
                 if (token) {
-                  setToken(null);
+                  localStorage.removeItem("token");
                 }
                 if (refreshToken) {
-                  setRefreshToken(null);
+                  localStorage.removeItem("refresh_token");
                 }
                 navigate("/auth/login");
               }}
