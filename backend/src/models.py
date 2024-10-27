@@ -6,7 +6,6 @@ from src.db import db
 
 class Roles(str, Enum):
     ADMIN = "ADMIN"
-    STUDENT = "STUDENT"
     TEACHER = "TEACHER"
 
 class User(db.Entity):
@@ -16,6 +15,7 @@ class User(db.Entity):
     password = Required(str)
     firstName = Required(str, column="firstName")
     lastName = Required(str, column="lastName")
+    teacher = Optional("Teacher")
     role = Required(str)
     _table_ = "Users"
 
@@ -38,14 +38,12 @@ class Encoding(db.Entity):
 
 class Teacher(db.Entity):
     id = PrimaryKey(uuid.UUID, auto=True)
-    dni = Required(str, unique=True)
-    firstName = Required(str, column="firstName")  
-    lastName = Required(str, column="lastName")    
-    email = Required(str, unique=True)             
+    dni = Required(str, unique=True)  
     phone = Required(str, column="phone")          
     address = Required(str, column="address")      
     hire_date = Required(date, column="hire_date") 
-    course = Optional("Course")        
+    course = Optional("Course")
+    user = Optional("User")        
     _table_ = "Professors"
 
 class Course(db.Entity):

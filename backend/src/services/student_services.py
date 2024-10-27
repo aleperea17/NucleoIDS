@@ -10,7 +10,7 @@ class StudentsService:
     def __init__(self):
         pass
 
-    def create_student(self, student_in: schemas.Student) -> dict:
+    def create_student(self, student_in: schemas.Student):
         with db_session:
             try:
                 # Busca el curso de acuerdo al nombre que recibe en el endpoint
@@ -43,10 +43,15 @@ class StudentsService:
             except:
                 raise HTTPException(status_code=404, detail="No se pudieron obtener los estudiantes")
 
-    def get_student(self, id:str):
+    def get_student(self,dni:str):
         with db_session:
             try:
-                student = select(s for s in models.Student if s.id == id)[:]
-                return student[0]
+                student = select(s for s in models.Student if s.dni == dni)[:]
+                if student:
+                    return student[0]
+                else:
+                    return False
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
+    
+
