@@ -10,6 +10,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const [token, setToken] = useLocalStorage("token", null);
+  const [refreshToken, setRefreshToken] = useLocalStorage(
+    "refresh_token",
+    null,
+  );
+
   const { pathname } = useLocation();
 
   console.log(pathname);
@@ -63,7 +68,10 @@ export const Navbar = () => {
               className="text-error"
               onClick={() => {
                 if (token) {
-                  setToken(null);
+                  localStorage.removeItem("token");
+                }
+                if (refreshToken) {
+                  localStorage.removeItem("refresh_token");
                 }
                 navigate("/auth/login");
               }}
