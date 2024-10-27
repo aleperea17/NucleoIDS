@@ -7,8 +7,10 @@ export const fetcher = axios.create({
 fetcher.interceptors.request.use(async (config) => {
 	let token = localStorage.getItem("token");
 	let refresh_token = localStorage.getItem("refresh_token");
-	token = token ? token.replace(/""/g, "") : null;
-	refresh_token = refresh_token ? refresh_token.replace(/""/g, "") : null;
+	token = token ? token.replace(/"/g, "") : null;
+	refresh_token = refresh_token ? refresh_token.replace(/"/g, "") : null;
+
+	console.log(typeof token, typeof refresh_token);
 	console.log(token, refresh_token);
 	if (token) {
 		const verify_token_response = await axios.post(
