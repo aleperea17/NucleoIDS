@@ -18,7 +18,6 @@ export default function LoginForm() {
 	} = useForm();
 
 	const onFormSubmit = async (data) => {
-		console.log(data);
 		const response = await fetcher.post("/auth/login", null, {
 			params: data,
 		});
