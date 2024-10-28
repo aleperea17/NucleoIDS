@@ -9,11 +9,16 @@ import TestPage from "./test-page/page";
 import TeachersPage from "./dashboard/teachers/teachers-page";
 import StudentsPage from "./dashboard/students/students-page";
 import FaceCapture from "./faceCapture";
+import ProfessorCourse from "../components/table/ProfessorCourseDetails"
 
 export const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Navigate to="/dashboard" />,
+	},
+	{
+		path: "/professor-course",
+		element: <ProfessorCourse professorId={"c1a71932-a697-4fe6-8833-f6de424b82cb"}/>,
 	},
 	{
 		path: "/teacherstable",
