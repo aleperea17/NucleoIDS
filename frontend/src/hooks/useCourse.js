@@ -1,46 +1,36 @@
-import { useState, useEffect } from 'react';
+import useSWR from "swr";
+import { fetcher } from "../fetcher/fetcher";
 
 const useProfessorCourse = (professorId) => {
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: course,
+    error,
+    isLoading
+  } = useSWR(
+    professorId ? `${import.meta.env.VITE_PUBLIC_API_URL}/courses/get-course-by-professor-id?professor_id=${professorId}` : null,
+    async (url) => {
+      const response = await fetcher.get(url);
+      console.log(response)
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`http://localhost:8000/courses/get-course-by-professor-id?professor_id=${professorId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (!data.Taller || !data.Estudiantes) {
-          throw new Error('La respuesta del servidor no tiene el formato esperado');
-        }
-        
-        setCourse(data);
-      } catch (err) {
-        setError(err.message);
-        setCourse(null);
-      } finally {
-        setLoading(false);
+      if (response.status != 200) {
+        throw new Error(`Error: ${response.status}`);
       }
-    };
 
-    if (professorId) {
-      fetchCourse();
+      const data = response.data;
+
+      if (!data.Taller || !data.Estudiantes) {
+        throw new Error('La respuesta del servidor no tiene el formato esperado');
+      }
+
+      return data;
     }
-  }, [professorId]);
+  );
 
-  return { course, loading, error };
+  return {
+    course,
+    loading: isLoading,
+    error
+  };
 };
 
 export default useProfessorCourse;

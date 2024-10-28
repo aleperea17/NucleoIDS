@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: "/professor-course",
-		element: <ProfessorCourse professorId={"c1a71932-a697-4fe6-8833-f6de424b82cb"}/>,
+		element: <ProfessorCourse professorId={"c1043d57-6785-40df-9883-3970b2e87c5c"}/>,
 	},
 	{
 		path: "/teacherstable",
