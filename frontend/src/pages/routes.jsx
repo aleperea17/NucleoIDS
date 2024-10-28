@@ -79,7 +79,15 @@ export const router = createBrowserRouter([
 						),
 					},
 					{
-						path: "assistance",
+						path: "my-students",
+						element: (
+							<ProtectedRoute allowedRoles={["TEACHER"]}>
+								<MyStudentsPage />
+							</ProtectedRoute>
+						),
+					},
+					{
+						path: "mark-assistance",
 						element: (
 							<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}>
 								<FaceCapture />

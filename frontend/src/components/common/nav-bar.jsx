@@ -25,6 +25,11 @@ export const ROUTES = {
       path: "my-students",
       label: "Mis estudiantes",
     },
+    {
+      path: "mark-assistance",
+      label: "Marcar Asistencia",
+    },
+    {},
   ],
 };
 
