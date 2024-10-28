@@ -20,3 +20,13 @@ def create_course(course:schemas.CourseCreate):
                 "message": e.detail,
                 "success": False, }
 
+@router.get("/get-course-by-professor-id")
+def get_course(professor_id: str):
+    try:
+        professor, course, students = service.get_professor_course(professor_id)
+        return {"Profesor":professor,"Taller":course, "Estudiantes":students,"success":True}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Error inesperado:{e}")
+        raise HTTPException(status_code=500, detail="No fue posible obtener los datos del curso.")
