@@ -10,8 +10,6 @@ fetcher.interceptors.request.use(async (config) => {
 	token = token ? token.replace(/"/g, "") : null;
 	refresh_token = refresh_token ? refresh_token.replace(/"/g, "") : null;
 
-	console.log(typeof token, typeof refresh_token);
-	console.log(token, refresh_token);
 	if (token) {
 		const verify_token_response = await axios.post(
 			`${import.meta.env.VITE_PUBLIC_API_URL}/auth/verify-token/?token=${token}`,

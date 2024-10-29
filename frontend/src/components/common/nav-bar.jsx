@@ -7,17 +7,41 @@ import {
 } from "react-daisyui";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/use-auth";
+
+export const ROUTES = {
+  ["ADMIN"]: [
+    {
+      path: "teachers",
+      label: "Profesores",
+    },
+    {
+      path: "students",
+      label: "Alumnos",
+    },
+  ],
+  ["TEACHER"]: [
+    {
+      path: "my-students",
+      label: "Mis estudiantes",
+    },
+    {
+      path: "mark-assistance",
+      label: "Marcar Asistencia",
+    },
+    {},
+  ],
+};
 
 export const Navbar = () => {
-  const [token, setToken] = useLocalStorage("token", null);
-  const [refreshToken, setRefreshToken] = useLocalStorage(
-    "refresh_token",
-    null,
-  );
+  const [token] = useLocalStorage("token", null);
+  const [refreshToken] = useLocalStorage("refresh_token", null);
+  const { user } = useAuth();
+
+  const routes = ROUTES[user.role];
 
   const { pathname } = useLocation();
 
-  console.log(pathname);
   const navigate = useNavigate();
   return (
     <DaisyUINavbar className="bg-base-100 shadow-md">
@@ -31,26 +55,16 @@ export const Navbar = () => {
         </Button>
       </DaisyUINavbar.Start>
       <DaisyUINavbar.Center>
-        <Button color="ghost" className="normal-case">
-          Dashboard
-        </Button>
-        <Button
-          color="ghost"
-          className="normal-case"
-          active={pathname.includes("students")}
-          onClick={() => navigate("/dashboard/students")}
-        >
-          Alumnos
-        </Button>
-        <Button
-          color="ghost"
-          className="normal-case"
-          active={pathname.includes("teachers")}
-          onClick={() => navigate("/dashboard/teachers")}
-        >
-          Profesores
-        </Button>
-        <Button color="ghost" className="normal-case"></Button>
+        {routes.map((route) => (
+          <Button
+            color="ghost"
+            className="normal-case"
+            active={pathname.includes(route.path)}
+            onClick={() => navigate(`/dashboard/${route.path}`)}
+          >
+            {route.label}
+          </Button>
+        ))}
       </DaisyUINavbar.Center>
       <DaisyUINavbar.End>
         <Dropdown vertical="bottom" horizontal="left">

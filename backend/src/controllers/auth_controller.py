@@ -1,6 +1,6 @@
 from fastapi import HTTPException, APIRouter, status, Depends
 from pony.orm import *
-from src import schemas
+from src import models, schemas
 from jose import jwt, JWTError, ExpiredSignatureError
 from src.services.user_services import UsersService
 from pydantic import BaseModel
@@ -116,11 +116,12 @@ async def register(user: schemas.UserCreate):
             "success": False,
         }
 
+
 @router.post("/register-user-professor", status_code=201)
-def register(user: schemas.UserProfessor, course_name:str):
+def register(user: schemas.UserProfessor, course_name: str):
     try:
-        user_created = service.create_user_teacher(user,course_name)
-        return {"detail":"Usuario y profesor creado con éxito.","success":True}
+        user_created = service.create_user_teacher(user, course_name)
+        return {"detail": "Usuario y profesor creado con éxito.", "success": True}
     except HTTPException as e:
         return {
             "message": e.detail,
@@ -154,3 +155,8 @@ async def login(request: schemas.LoginRequest = Depends()):
         "refresh_token": jwt.encode(refresh_token, key=SECRET_KEY, algorithm="HS256"),
         "token_type": "bearer"
     }
+
+
+@router.get("/me", response_model=schemas.BaseUser)
+async def get_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
