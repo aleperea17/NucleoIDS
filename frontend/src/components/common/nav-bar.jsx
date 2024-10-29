@@ -40,8 +40,6 @@ export const Navbar = () => {
 
   const routes = ROUTES[user.role];
 
-  console.log(routes);
-
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
