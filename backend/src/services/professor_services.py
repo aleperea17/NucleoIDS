@@ -45,3 +45,79 @@ class ProfessorService:
                 print(f"Error al crear el profesor: {e}")
                 raise HTTPException(
                     status_code=500, detail="Error al obtener el profesor.")
+            
+    def update_teacher(self, dni: str, update_data: schemas.UserProfessor) -> dict:
+        with db_session:
+            try:
+                teacher = models.Teacher.get(dni=dni)
+                if not teacher:
+                    raise HTTPException(status_code=404, detail="Profesor no encontrado")
+
+                # Actualizar datos en la tabla Teacher
+                teacher.phone = update_data.phone
+                teacher.address = update_data.address
+                teacher.hire_date = update_data.hire_date
+
+                # Actualizar datos en la tabla User relacionada
+                user = teacher.user
+                if user:
+                    user.firstName = update_data.firstName
+                    user.lastName = update_data.lastName
+                    user.email = update_data.email
+
+                return {"message": "Profesor actualizado correctamente"}
+                
+            except Exception as e:
+                print(f"Error al actualizar el profesor: {e}")  # Esto muestra el error en la consola
+                raise HTTPException(
+                    status_code=500, detail="Error inesperado al actualizar el profesor.")
+    
+    def get_teacher(self, dni: str) -> dict:
+        with db_session:
+            try:
+                # Obtener el profesor por DNI
+                teacher = models.Teacher.get(dni=dni)
+                if not teacher:
+                    raise HTTPException(status_code=404, detail="Profesor no encontrado")
+
+                # Crear el diccionario de respuesta
+                teacher_data = {
+                    "dni": teacher.dni,
+                    "phone": teacher.phone,
+                    "address": teacher.address,
+                    "hire_date": teacher.hire_date
+                }
+
+                # Si el profesor tiene un usuario relacionado, añadir esos datos
+                if teacher.user:
+                    teacher_data.update({
+                        "username": teacher.user.username,
+                        "email": teacher.user.email,
+                        "firstName": teacher.user.firstName,
+                        "lastName": teacher.user.lastName,
+                        "role": teacher.user.role
+                    })
+
+                return teacher_data
+
+            except Exception as e:
+                print(f"Error al obtener el profesor: {e}")
+                raise HTTPException(
+                    status_code=500, detail="Error al obtener el profesor.")
+    
+    def delete_teacher(self, dni: str) -> dict:
+        with db_session:
+            # Buscar el profesor con el DNI especificado
+            teacher = models.Teacher.get(dni=dni)
+            if not teacher:
+                raise HTTPException(status_code=404, detail="Profesor no encontrado")
+
+            try:
+                # Eliminar solo el profesor
+                teacher.delete()
+                return {"message": "Profesor eliminado correctamente"}
+            
+            except Exception as e:
+                print(f"Error al eliminar el profesor: {e}")
+                raise HTTPException(status_code=500, detail="Error al eliminar el profesor.")
+    
