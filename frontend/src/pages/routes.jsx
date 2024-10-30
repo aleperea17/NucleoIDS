@@ -7,6 +7,7 @@ import DashboardPage from "./dashboard/dashboard";
 import TestPage from "./test-page/page";
 import StudentsPage from "./dashboard/students/students-page";
 import FaceCapture from "./faceCapture";
+import ProfessorCourse from "../components/table/ProfessorCourseDetails";
 import { AuthProvider } from "../hooks/use-auth";
 import { ProtectedRoute } from "../components/common/private-route";
 import TeachersPage from "./dashboard/teachers/teachers-page";
@@ -16,6 +17,12 @@ export const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Navigate to="/dashboard" />,
+	},
+	{
+		path: "/professor-course",
+		element: (
+			<ProfessorCourse professorId={"c1043d57-6785-40df-9883-3970b2e87c5c"} />
+		),
 	},
 	{
 		path: "/auth",
@@ -51,10 +58,6 @@ export const router = createBrowserRouter([
 				element: <DashboardPage />,
 				children: [
 					{
-						path: "test-page",
-						element: <TestPage />,
-					},
-					{
 						path: "teachers",
 						element: (
 							<ProtectedRoute allowedRoles={["ADMIN"]}>
@@ -67,14 +70,6 @@ export const router = createBrowserRouter([
 						element: (
 							<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}>
 								<StudentsPage />
-							</ProtectedRoute>
-						),
-					},
-					{
-						path: "my-students",
-						element: (
-							<ProtectedRoute allowedRoles={["TEACHER"]}>
-								<MyStudentsPage />
 							</ProtectedRoute>
 						),
 					},

@@ -51,3 +51,22 @@ class CourseService():
                 student.courses = self.get_course(course_name)
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
+
+    def get_professor_course(self, professor_id:str):
+        with db_session:
+            professor = models.Teacher.get(id=professor_id)
+            if not professor:
+                raise HTTPException(
+                    status_code=404, 
+                    detail=f"Profesor con ID {professor_id} no encontrado"
+                )
+        
+            course = professor.course
+            if not course:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No se encontró un curso asociado al profesor con ID {professor_id}"
+                )
+            students = [{"dni": s.dni, "firstName":s.firstName,"lastName":s.lastName} for s in course.students]
+
+            return professor.to_dict(),course.to_dict(),students
