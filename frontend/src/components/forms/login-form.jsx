@@ -4,10 +4,12 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { fetcher } from "../../fetcher/fetcher";
+import { AxiosError } from "axios";
 
 export default function LoginForm() {
 	const [_, setToken] = useLocalStorage("token", "");
+	const [_$, setRefreshToken] = useLocalStorage("refresh_token", "");
 
 	const navigate = useNavigate();
 	const {
@@ -17,21 +19,25 @@ export default function LoginForm() {
 	} = useForm();
 
 	const onFormSubmit = async (data) => {
-		const response = await axios.post(
-			"http://localhost:8000/auth/login",
-			null,
-			{
+		try {
+			const response = await fetcher.post("/auth/login", null, {
 				params: data,
-			},
-		);
-
-		console.log(response.data);
-		if (response.data.success) {
+			});
 			toast.success("Sesión iniciada con éxito", { position: "top-right" });
 			setToken(response.data.access_token);
+			setRefreshToken(response.data.refresh_token);
 			navigate("/dashboard");
-		} else {
-			toast.error("Algo salió mal!");
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				if (error.response.data.detail) {
+					return toast.error(error.response.data.detail, {
+						position: "top-right",
+					});
+				}
+				toast.error("Algo salió mal", {
+					position: "top-right",
+				});
+			}
 		}
 	};
 
@@ -53,17 +59,17 @@ export default function LoginForm() {
 						Es lindo verte de nuevo 👋 inicia sesión abajo
 					</p>
 					<Form onSubmit={handleSubmit(onFormSubmit)} className="form-control">
-						<Button
-							color="outline"
-							className="w-full mb-4 flex justify-center items-center"
-						>
-							<img
-								src="/google.webp"
-								alt="Google logo"
-								className="w-5 h-5 mr-2"
-							/>
-							Continuar con Google
-						</Button>
+						{/* <Button */}
+						{/* 	color="outline" */}
+						{/* 	className="w-full mb-4 flex justify-center items-center" */}
+						{/* > */}
+						{/* 	<img */}
+						{/* 		src="/google.webp" */}
+						{/* 		alt="Google logo" */}
+						{/* 		className="w-5 h-5 mr-2" */}
+						{/* 	/> */}
+						{/* 	Continuar con Google */}
+						{/* </Button> */}
 						<label className="label">
 							<span className="label-text">Correo electrónico</span>
 						</label>

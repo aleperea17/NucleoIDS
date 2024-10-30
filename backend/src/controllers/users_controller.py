@@ -11,7 +11,7 @@ from src.controllers.auth_controller import get_current_user
 router = APIRouter()
 user_service = UsersService()
 
-
+@router.get("/students")
 @db_session
 def get_students(
     page: int = Query(1, ge=1, description="Número de página"),
@@ -21,7 +21,6 @@ def get_students(
         None, description="Ordenar por campo (e.g., 'username', 'email')"),
     order: Optional[str] = Query(
         "asc", regex="^(asc|desc)$", description="Orden asc o desc"),
-    role: Optional[models.Roles] = Query(None, description="Filtrar por rol")
 ):
     query = select(s for s in models.Student)
 
@@ -59,15 +58,12 @@ async def get_users(token: str = Depends(get_current_user),
     role: Roles | None = Query(None, description="Filtrar por rol"),
 ):
     try:
-        if role == Roles.STUDENT:
-            list_of_students = get_students(page, count, sort, role)
-            return list_of_students
-        else:
-            list_of_users = user_service.get_users(
-                page, count, sort, order, role)
-            print(list_of_users)
-            return list_of_users
-    except:
+        list_of_users = user_service.get_users(
+        page, count, sort, order, role)
+        print(list_of_users)
+        return list_of_users
+    except HTTPException as e:
+        print(e)
         raise HTTPException(
             status_code=401, detail="Token inválido o expirado")
 
@@ -84,7 +80,7 @@ class StudentCreateRequest(BaseModel):
 @router.post("/student")
 @db_session
 def create_student(student_request: StudentCreateRequest):
-    # Check if student with same dni already exists
+    # Comprobar si ya existe un estudiante con ese DNI
     if Student.get(dni=student_request.dni):
         raise HTTPException(
             status_code=400, detail="Student with this DNI already exists")
