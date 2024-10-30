@@ -2,11 +2,11 @@ import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
 import { Toaster } from "react-hot-toast";
-import StudentTable from "../components/table/StudentTable";
 import DashboardPage from "./dashboard/dashboard";
-import TestPage from "./test-page/page";
 import StudentsPage from "./dashboard/students/students-page";
 import FaceCapture from "./faceCapture";
+import ModifyStudent from "../components/table/ModifyStudent";
+import AttHistory from "../components/table/AttHistory";
 import ProfessorCourse from "../components/table/ProfessorCourseDetails";
 import { AuthProvider } from "../hooks/use-auth";
 import { ProtectedRoute } from "../components/common/private-route";
@@ -23,6 +23,16 @@ export const router = createBrowserRouter([
 		element: (
 			<ProfessorCourse professorId={"c1043d57-6785-40df-9883-3970b2e87c5c"} />
 		),
+	},
+	{
+		path: "/modifystudent",
+		element: <ModifyStudent />,
+
+	},
+	{
+		path: "/atthistory",
+		element: <AttHistory />,
+
 	},
 	{
 		path: "/auth",
