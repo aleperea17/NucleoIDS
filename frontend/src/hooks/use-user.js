@@ -5,12 +5,12 @@ import useLocalStorage from "./useLocalStorage";
 import { fetcher } from "../fetcher/fetcher";
 
 const getAllUsers = async (url) => {
-  try {
-    const response = await fetcher.get(url);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+	try {
+		const response = await fetcher.get(url);
+		return response.data;
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 /**
@@ -30,38 +30,36 @@ const getAllUsers = async (url) => {
  */
 
 export default function useUsers(config) {
-  const [count, setCount] = React.useState(11);
-  const [page, setPage] = React.useState(1);
+	const [count, setCount] = React.useState(11);
+	const [page, setPage] = React.useState(1);
+	const url = `/users/${config.role === "STUDENT" ? "students" : ""}?page=${page}&count=${count}&order=asc${config && config.role ? `&role=${config.role}` : ""}`;
 
-  console.log(import.meta.env.VITE_PUBLIC_API_URL);
-  const { data, isLoading, error, mutate } = useSWR(
-    `/users/?page=${page}&count=${count}&order=asc${config && config.role ? `&role=${config.role}` : ""}`,
-    getAllUsers,
-  );
+	console.log(import.meta.env.VITE_PUBLIC_API_URL);
+	const { data, isLoading, error, mutate } = useSWR(url, getAllUsers);
 
-  const goToNextPage = () => {
-    const { total } = data;
+	const goToNextPage = () => {
+		const { total } = data;
 
-    if (page * count < total) {
-      setPage((prevPage) => prevPage + 1);
-      return;
-    }
-  };
+		if (page * count < total) {
+			setPage((prevPage) => prevPage + 1);
+			return;
+		}
+	};
 
-  const goToPrevPage = () => {
-    if (page < 1) {
-      setPage((prevPage) => prevPage - 1);
-      return;
-    }
-  };
+	const goToPrevPage = () => {
+		if (page < 1) {
+			setPage((prevPage) => prevPage - 1);
+			return;
+		}
+	};
 
-  const changeCount = (val) => setCount(val);
+	const changeCount = (val) => setCount(val);
 
-  const helpers = {
-    goToPrevPage,
-    goToNextPage,
-    changeCount,
-  };
+	const helpers = {
+		goToPrevPage,
+		goToNextPage,
+		changeCount,
+	};
 
-  return { data, isLoading, error, mutate, helpers, count, page };
+	return { data, isLoading, error, mutate, helpers, count, page };
 }
