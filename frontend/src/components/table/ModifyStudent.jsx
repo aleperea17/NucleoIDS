@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import Table from './table'; 
+import { Button, Modal } from 'react-daisyui'; 
+import { PencilIcon } from '@heroicons/react/24/outline'; 
 
 export default function StudentsManagement() {
   const [loading, setLoading] = useState(false);
@@ -15,25 +17,36 @@ export default function StudentsManagement() {
     address: '',
     phone: '',
   });
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
   const columns = [
     { header: 'ID', accessor: 'id' },
     { header: 'Nombre y apellido', accessor: 'name' },
     { header: 'Correo electrónico', accessor: 'address' },
     { header: 'Teléfono', accessor: 'phone' },
+    {
+      header: 'Acciones',
+      render: (value, row) => {
+        const handleShowEditDialog = () => {
+          setSelectedStudent(row);
+          setFormData({
+            name: row.name,
+            address: row.address,
+            phone: row.phone,
+          });
+          setIsModalOpen(true); 
+        };
+
+        return (
+          <Button onClick={handleShowEditDialog} className="btn-icon bg-gray-300 p-2 rounded-full">
+            <PencilIcon className="h-5 w-5 text-customOrange" /> 
+          </Button>
+        );
+      },
+    },
   ];
 
-  // Manejar la selección de un alumno
-  const handleSelectStudent = (student) => {
-    setSelectedStudent(student);
-    setFormData({
-      name: student.name,
-      address: student.address,
-      phone: student.phone,
-    });
-  };
-
-  // Manejar cambios en el formulario
+  
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -41,7 +54,7 @@ export default function StudentsManagement() {
     });
   };
 
-  // Guardar los cambios realizados en el alumno
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     setStudents((prev) =>
@@ -50,77 +63,84 @@ export default function StudentsManagement() {
       )
     );
     alert('Datos modificados exitosamente');
+    setIsModalOpen(false); 
   };
 
   return (
     <div className="p-6 bg-base-200 min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-8 text-customOrangenom ">Gestión de Alumnos</h1>
+      <h1 className="text-3xl font-bold text-center mb-8 text-customOrange">Gestión de Alumnos</h1>
 
       <div className="card shadow-lg p-6 bg-base-100">
         <h2 className="text-xl font-bold mb-4">Lista de Alumnos</h2>
 
-        {/* Tabla reutilizable con DaisyUI */}
+     
         <Table
           columns={columns}
           data={students}
           loading={loading}
           withCheckbox={false}
-          onRowClick={handleSelectStudent} // Nueva propiedad para manejar la selección
         />
 
-        <h2 className="text-xl font-bold mt-8 mb-4">Modificar Datos del Alumno</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Nombre</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Nombre"
-                className="input input-bordered input-sm"
-                disabled={!selectedStudent} // Deshabilitar si no hay alumno seleccionado
-              />
+    
+        {isModalOpen && (
+          <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <div className="p-4">
+              <h2 className="text-xl font-bold mb-4">Modificar Datos del Alumno</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Nombre</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Nombre"
+                      className="input input-bordered input-sm"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Correo electrónico</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      placeholder="Correo electrónico"
+                      className="input input-bordered input-sm"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Teléfono</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Teléfono"
+                      className="input input-bordered input-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end mt-6 space-x-2">
+                  <button className="btn btn-primary btn-sm" type="submit">
+                    Guardar Cambios
+                  </button>
+                  <Button onClick={() => setIsModalOpen(false)} className="btn btn-sm">
+                    Cerrar
+                  </Button>
+                </div>
+              </form>
             </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Correo electrónico</span>
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                placeholder="Correo electrónico"
-                className="input input-bordered input-sm"
-                disabled={!selectedStudent}
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Teléfono</span>
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                placeholder="Teléfono"
-                className="input input-bordered input-sm"
-                disabled={!selectedStudent}
-              />
-            </div>
-          </div>
-          <button
-            className="btn btn-primary mt-6 btn-sm"
-            disabled={!selectedStudent} // Deshabilitar el botón si no hay un alumno seleccionado
-          >
-            Guardar Cambios
-          </button>
-        </form>
+          </Modal>
+        )}
       </div>
     </div>
   );
