@@ -2,13 +2,11 @@ export default function useUsers(config) {
   const [count, setCount] = React.useState(11);
   const [page, setPage] = React.useState(1);
 
-  console.log(import.meta.env.VITE_PUBLIC_API_URL);
   const { data, isLoading, error, mutate } = useSWR(
     `${import.meta.env.VITE_PUBLIC_API_URL}/users/?page=${page}&count=${count}&order=asc${config && config.role ? `&role=${config.role}` : ""}`,
     getAllUsers,
   );
 
-  console.log(count, page);
   const goToNextPage = () => {
     const { total } = data;
 
