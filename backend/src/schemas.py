@@ -16,6 +16,16 @@ class BaseProfessor(BaseModel):
 class ProfessorCreate(BaseProfessor):
     pass
 
+class ProfessorUpdate(BaseModel):
+    username: str | None = None
+    email: str | None = None
+    firstName: str | None = None
+    lastName: str | None = None
+    dni: str | None = None
+    phone: str | None = None
+    address: str | None = None
+    hire_date: date | None = None
+
 
 class BaseUser(BaseModel):
     username: str
@@ -61,3 +71,6 @@ class Student(BaseModel):
 
 class TokenVerificationRequest(BaseModel):
     token: str
+
+class UserProfessor(BaseUser, BaseProfessor):
+    pass
