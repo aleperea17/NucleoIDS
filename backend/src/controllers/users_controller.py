@@ -11,6 +11,7 @@ from src.controllers.auth_controller import get_current_user
 router = APIRouter()
 user_service = UsersService()
 
+
 @router.get("/students")
 @db_session
 def get_students(
@@ -59,7 +60,7 @@ async def get_users(token: str = Depends(get_current_user),
 ):
     try:
         list_of_users = user_service.get_users(
-        page, count, sort, order, role)
+            page, count, sort, order, role)
         print(list_of_users)
         return list_of_users
     except HTTPException as e:

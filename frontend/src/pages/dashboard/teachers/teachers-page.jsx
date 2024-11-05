@@ -1,5 +1,13 @@
-import React from "react";
-import { Badge, Button, Mask, Modal, Pagination, Select } from "react-daisyui";
+import React, { useState } from "react";
+import {
+	Badge,
+	Button,
+	Mask,
+	Modal,
+	Pagination,
+	Select,
+	Tooltip,
+} from "react-daisyui";
 import TeacherCreateForm from "./teacher-create-form";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -7,6 +15,9 @@ import axios from "axios";
 import Heading from "../../../components/common/heading";
 import Table from "../../../components/table/Table";
 import useUsers from "../../../hooks/use-user";
+import { MapPinIcon, PencilIcon, PhoneIcon } from "lucide-react";
+import EditTeacherModal from "../../../components/teachers/edit-teacher-modal";
+import { render } from "react-dom";
 
 export default function TeachersPage() {
 	const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
@@ -51,22 +62,84 @@ export default function TeachersPage() {
 				</div>
 			),
 		},
-		{
-			header: "Role",
-			accessor: "role",
-			render: (role) => (
-				<div className="w-full">
-					<br />
-					<Badge color="ghost" size="sm">
-						{roleMap[role]}
-					</Badge>
-				</div>
-			),
-		},
+		// {
+		// 	header: "Rol",
+		// 	accessor: "role",
+		// 	render: (role) => (
+		// 		<div className="w-full">
+		// 			<br />
+		// 			<Badge color="ghost" size="sm">
+		// 				{roleMap[role]}
+		// 			</Badge>
+		// 		</div>
+		// 	),
+		// },
 		{
 			header: "Correo",
 			accessor: "email",
-			render: (email) => <div>{email}</div>,
+			render: (email) => <a>{email}</a>,
+		},
+		{
+			header: "Teléfono",
+			render: (_, row) => (
+				<Tooltip message="Abrir en WhatsApp Web">
+					<a
+						href={`https://api.whatsapp.com/send?phone=549${row.teacher.phone}`}
+					>
+						<div className="flex gap-3 items-center">
+							<PhoneIcon />
+							{row.teacher.phone}
+						</div>
+					</a>
+				</Tooltip>
+			),
+		},
+		{
+			header: "Dirección",
+			render: (_, row) => {
+				return (
+					<div className="flex items-center gap-3">
+						<MapPinIcon />
+						{row.teacher.address}
+					</div>
+				);
+			},
+		},
+		{
+			header: "Acciones",
+			accessor: "",
+			render: (_, row) => {
+				const [isOpen, setIsOpen] = useState(false);
+				const { email, firstName, lastName, ...rest } = row;
+				const handleSubmit = (data) => { };
+				return (
+					<>
+						<Tooltip message="Editar">
+							<Button
+								color="accent"
+								size="sm"
+								onClick={() => setIsOpen(!isOpen)}
+							>
+								<PencilIcon className="w-5 h-5" />
+							</Button>
+						</Tooltip>
+						<EditTeacherModal
+							defaultValues={{
+								firstName,
+								lastName,
+								email,
+								dni: row.teacher.dni,
+								phone: row.teacher.phone,
+								hire_date: row.teacher.hire_date,
+								address: row.teacher.address,
+							}}
+							isOpen={isOpen}
+							onClose={() => setIsOpen(false)}
+							onSubmit={() => { }}
+						/>
+					</>
+				);
+			},
 		},
 	];
 	const { Dialog, handleShow, handleHide } = Modal.useDialog();
