@@ -15,10 +15,10 @@ import axios from "axios";
 import Heading from "../../../components/common/heading";
 import Table from "../../../components/table/Table";
 import useUsers from "../../../hooks/use-user";
-import { MapPinIcon, PencilIcon, PhoneIcon } from "lucide-react";
+import { MapPinIcon, PencilIcon, PhoneIcon, TrashIcon, X } from "lucide-react";
 import EditTeacherModal from "../../../components/teachers/edit-teacher-modal";
 import { render } from "react-dom";
-import { updateOneTeacher } from "../../../fetcher/mutations";
+import { deleteOneTeacher, updateOneTeacher } from "../../../fetcher/mutations";
 
 export default function TeachersPage() {
 	const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
@@ -111,13 +111,14 @@ export default function TeachersPage() {
 			accessor: "",
 			render: (_, row) => {
 				const [isOpen, setIsOpen] = useState(false);
+				const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 				const { email, firstName, lastName, ...rest } = row;
 				const handleSubmit = async (data) => {
 					await updateOneTeacher(data);
 				};
 				console.log(rest);
 				return (
-					<>
+					<div className="flex items-center gap-2">
 						<Tooltip message="Editar">
 							<Button
 								color="accent"
@@ -142,7 +143,56 @@ export default function TeachersPage() {
 							onClose={() => setIsOpen(false)}
 							onSubmit={handleSubmit}
 						/>
-					</>
+						<>
+							<Tooltip message="Eliminar">
+								<Button
+									onClick={() => setIsConfirmModalOpen(true)}
+									color="error"
+									type="button"
+									size="sm"
+								>
+									<TrashIcon className="w-5 h-5" />
+								</Button>
+							</Tooltip>
+							<Modal open={isConfirmModalOpen}>
+								<Modal.Header className="font-bold text-lg relative text-balance">
+									¿Estás seguro de eliminar a este profesor?
+									<Button
+										type="button"
+										className="btn-circle absolute right-0"
+										size="sm"
+										onClick={() => setIsConfirmModalOpen(false)}
+									>
+										<X className="w-4 h-4" />
+									</Button>
+								</Modal.Header>
+								<Modal.Body className="text-base">
+									¿Estas seguro de <strong>eliminar</strong> a {firstName}{" "}
+									{lastName}?. <br />
+									Despues de esta acción el profesor{" "}
+									<strong>
+										{firstName} {lastName}
+									</strong>{" "}
+									<strong>no tendrá acceso a la plataforma.</strong>
+								</Modal.Body>
+								<Modal.Actions>
+									<Button
+										type="button"
+										onClick={() => setIsConfirmModalOpen(false)}
+									>
+										Cancelar
+									</Button>
+									<Button
+										type="button"
+										color="error"
+										onClick={() => deleteOneTeacher(row.teacher.dni)}
+									>
+										Confirmar
+									</Button>
+								</Modal.Actions>
+							</Modal>
+						</>
+					</div>
 				);
 			},
 		},

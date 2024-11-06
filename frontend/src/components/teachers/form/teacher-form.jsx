@@ -3,7 +3,7 @@ import { useForm, useFormContext } from "react-hook-form";
 import Autocomplete from "../../common/autocomplete";
 import useSWR from "swr";
 import { fetcher } from "../../../fetcher/fetcher";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const getCoursesFetcher = async (url) => {
 	try {
@@ -41,6 +41,11 @@ const TeacherForm = ({ onSubmit, defaultValues }) => {
 		setIsLoading(false);
 	};
 
+	const value = useMemo(() => {
+		return courses
+			? courses.find((c) => c.value === state.courseId)
+			: undefined;
+	}, [courses, state]);
 	return (
 		<Form
 			onSubmit={handleSubmit(handleFormSubmit)}
@@ -107,7 +112,8 @@ const TeacherForm = ({ onSubmit, defaultValues }) => {
 			</div>
 			<Autocomplete
 				value={
-					courses ? courses.find((c) => c.value === state.courseId) : undefined
+					value
+					// courses ? courses.find((c) => c.value === state.courseId) : undefined
 				}
 				className="col-span-2"
 				placeholder="Buscar talleres..."

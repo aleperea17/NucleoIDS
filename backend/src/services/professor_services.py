@@ -148,24 +148,13 @@ class ProfessorService:
                     status_code=404, detail="Profesor no encontrado")
 
             try:
-                # Eliminar cursos asociados al profesor
-                if teacher.course:
-                    for course in teacher.course:
-                        # Eliminar asistencias relacionadas con el curso
-                        for attendance in course.attendance:
-                            attendance.delete()
+                course = models.Course.get(teacher=teacher)
+                if course:
+                    course.teacher = None
 
-                        # Eliminar relación del curso con estudiantes
-                        for student in course.students:
-                            student.courses.remove(course)
-
-                        course.delete()
-
-                # Eliminar usuario asociado al profesor, si existe
                 if teacher.user:
                     teacher.user.delete()
 
-                # Finalmente, eliminar el profesor
                 teacher.delete()
                 return {"message": "Profesor y todos los datos relacionados eliminados correctamente"}
 

@@ -9,12 +9,23 @@ export const updateOneTeacher = async (data) => {
 		});
 
 		console.log(response.data.success);
-		toast.success(response.data.message);
 		if (response.data.success) {
+			toast.success(response.data.message);
 		}
 	} catch (error) {
 		toast.error("Algo salió mal!");
 
 		console.log(error);
+	}
+};
+
+export const deleteOneTeacher = async (dni) => {
+	try {
+		const response = await fetcher.delete(`/teachers/${dni}`);
+		if (response.data.success) {
+			toast.success(response.data.message);
+		}
+	} catch (error) {
+		toast.error("No se pudo eliminar el profesor");
 	}
 };

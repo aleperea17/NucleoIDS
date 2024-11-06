@@ -27,13 +27,17 @@ const Autocomplete = ({
 	const [inputValue, setInputValue] = useState(
 		defaultValue ? defaultValue.label : "",
 	);
+
 	useEffect(() => {
-		if (defaultValue && defaultValue.value !== value) {
+		if (
+			(defaultValue && defaultValue.value !== value) ||
+			(defaultValue && defaultValue.label !== inputValue)
+		) {
 			setInputValue(defaultValue.label);
 			onChange(defaultValue.value);
 		}
 	}, [defaultValue]);
-	console.log(defaultValue, inputValue);
+
 	const inputRef = useRef(null);
 
 	const handleChange = (e) => {
@@ -96,7 +100,7 @@ const Autocomplete = ({
 	return (
 		<div className={`relative w-full ${className} flex items-center gap-2`}>
 			<Input
-				defaultValue={defaultValue}
+				defaultValue={defaultValue ? defaultValue.label : undefined}
 				ref={inputRef}
 				type="text"
 				placeholder={placeholder}
