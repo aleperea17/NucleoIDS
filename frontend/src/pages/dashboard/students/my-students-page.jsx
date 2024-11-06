@@ -9,7 +9,7 @@ import useUsers from "../../../hooks/use-user";
 import StudentsCreateForm from "./students-create-form";
 import { columns } from "./table-columns";
 
-export default function StudentsPage() {
+export default function MyStudentsPage() {
   const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
     role: "STUDENT",
   });
@@ -37,7 +37,7 @@ export default function StudentsPage() {
     <section className="px-10 py-5">
       <Heading
         title="Lista de Estudiantes"
-        description="Acá podrás encontrar la lista de todos los estudiantes"
+        description="Acá podrás encontrar la lista de tus estudiantes"
         action={
           <div className="flex flex-row gap-3 items-center">
             <Button onClick={handleShow} color="primary">

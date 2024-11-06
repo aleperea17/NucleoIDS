@@ -16,7 +16,7 @@ const RegisterForm = () => {
 		const { confirmPassword, ...rest } = data;
 		const response = await fetcher.post("/auth/register", {
 			...rest,
-			role: "STUDENT",
+			role: "ADMIN",
 		});
 
 		if (response.data.success) {

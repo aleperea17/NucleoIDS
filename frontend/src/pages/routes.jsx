@@ -2,14 +2,16 @@ import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import LoginForm from "../components/forms/login-form";
 import RegisterForm from "../components/forms/register-form";
 import { Toaster } from "react-hot-toast";
-import TeachersTable from "../components/table/TeachersTable";
-import StudentTable from "../components/table/StudentTable";
 import DashboardPage from "./dashboard/dashboard";
-import TestPage from "./test-page/page";
-import TeachersPage from "./dashboard/teachers/teachers-page";
 import StudentsPage from "./dashboard/students/students-page";
 import FaceCapture from "./faceCapture";
-import ProfessorCourse from "../components/table/ProfessorCourseDetails"
+import ModifyStudent from "../components/table/ModifyStudent";
+import AttHistory from "../components/table/AttHistory";
+import ProfessorCourse from "../components/table/ProfessorCourseDetails";
+import { AuthProvider } from "../hooks/use-auth";
+import { ProtectedRoute } from "../components/common/private-route";
+import TeachersPage from "./dashboard/teachers/teachers-page";
+import MyStudentsPage from "./dashboard/students/my-students-page";
 
 export const router = createBrowserRouter([
 	{
@@ -18,15 +20,19 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: "/professor-course",
-		element: <ProfessorCourse professorId={"c1a71932-a697-4fe6-8833-f6de424b82cb"}/>,
+		element: (
+			<ProfessorCourse professorId={"c1043d57-6785-40df-9883-3970b2e87c5c"} />
+		),
 	},
 	{
-		path: "/teacherstable",
-		element: <TeachersTable />,
+		path: "/modifystudent",
+		element: <ModifyStudent />,
+
 	},
 	{
-		path: "/studenttable",
-		element: <StudentTable />,
+		path: "/atthistory",
+		element: <AttHistory />,
+
 	},
 	{
 		path: "/auth",
@@ -48,29 +54,71 @@ export const router = createBrowserRouter([
 		],
 	},
 	{
-		path: "/facecapture",
-		element: <FaceCapture/>,
-	},
-	{
-		path: "/dashboard",
-		element: <DashboardPage />,
+		path: "/",
+		element: (
+			<AuthProvider>
+				<ProtectedRoute>
+					<Outlet />
+				</ProtectedRoute>
+			</AuthProvider>
+		),
 		children: [
 			{
-				path: "test-page",
-				element: <TestPage />,
+				path: "dashboard",
+				element: <DashboardPage />,
+				children: [
+					{
+						path: "teachers",
+						element: (
+							<ProtectedRoute allowedRoles={["ADMIN"]}>
+								<TeachersPage />
+							</ProtectedRoute>
+						),
+					},
+					{
+						path: "students",
+						element: (
+							<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}>
+								<StudentsPage />
+							</ProtectedRoute>
+						),
+					},
+					{
+						path: "my-students",
+						element: (
+							<ProtectedRoute allowedRoles={["TEACHER"]}>
+								<MyStudentsPage />
+							</ProtectedRoute>
+						),
+					},
+					{
+						path: "mark-assistance",
+						element: (
+							<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}>
+								<FaceCapture />
+							</ProtectedRoute>
+						),
+					},
+				],
 			},
 			{
-				path: "teachers",
-				element: <TeachersPage />,
-			},
-			{
-				path: "students",
-				element: <StudentsPage />,
-			},
-			{
-				path: "assistance",
-				element: <FaceCapture />,
+				path: "facecapture",
+				element: (
+					<ProtectedRoute allowedRoles={["ADMIN", "TEACHER"]}>
+						<FaceCapture />
+					</ProtectedRoute>
+				),
 			},
 		],
 	},
+	// Ruta para página no autorizada
+	// {
+	// 	path: "/unauthorized",
+	// 	element: <UnauthorizedPage />,
+	// },
+	// // Ruta para página no encontrada
+	// {
+	// 	path: "*",
+	// 	element: <NotFoundPage />,
+	// },
 ]);

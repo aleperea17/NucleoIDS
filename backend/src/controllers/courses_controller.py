@@ -1,7 +1,8 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, Depends
 from pony.orm import db_session
 from src import models,schemas
 from src.services.courses_services import CourseService
+from src.controllers.auth_controller import get_current_user
 
 router = APIRouter()
 service = CourseService()
@@ -21,9 +22,16 @@ def create_course(course:schemas.CourseCreate):
                 "success": False, }
 
 @router.get("/get-course-by-professor-id")
-def get_course(professor_id: str):
+def get_course(professor_id: str,current_user = Depends(get_current_user)):
     try:
+        if not str(current_user.id):
+            raise HTTPException(
+                status_code=403,
+                detail="No tienes permiso para acceder a esta información"
+            )
+        
         professor, course, students = service.get_professor_course(professor_id)
+
         return {"Profesor":professor,"Taller":course, "Estudiantes":students,"success":True}
     except HTTPException as e:
         raise e
