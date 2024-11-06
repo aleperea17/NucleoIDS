@@ -3,13 +3,15 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Query, Depends, HTTPException
 from pony.orm import db_session, desc, select
 from pydantic import BaseModel
-from src import models
+from src import models,schemas
 from src.models import Roles, Student
 from src.services.user_services import UsersService
+from src.services.student_services import StudentsService
 from src.controllers.auth_controller import get_current_user
 
 router = APIRouter()
 user_service = UsersService()
+students_service = StudentsService()
 
 
 @router.get("/students")
@@ -102,3 +104,14 @@ def create_student(student_request: StudentCreateRequest):
         "firstName": student.firstName,
         "lastName": student.lastName
     }
+
+@router.put("/modify-student")
+def modify_student(student_in: schemas.Student, token:str = Depends(get_current_user)):
+    try:
+        student = students_service.modify_student(student_in)
+        if student:
+            return {f"Se editaron los datos con éxito.":student,"success":True}
+    except HTTPException as e:
+        return {
+            "message": e.detail,
+            "success": False, }
