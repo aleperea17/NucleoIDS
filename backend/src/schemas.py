@@ -1,4 +1,5 @@
 from pony.orm import Optional
+from pony.orm.dbapiprovider import UUID
 from pydantic import BaseModel
 from typing import List
 from src.models import Roles
@@ -30,6 +31,7 @@ class ProfessorUpdate(BaseModel):
     phone: str | None = None
     address: str | None = None
     hire_date: date | None = None
+    courseId: UUID | None = None
 
 
 class BaseUser(BaseModel):
@@ -84,6 +86,8 @@ class TokenVerificationRequest(BaseModel):
     token: str
 
 
-class UserProfessor(BaseUser):
+class UserProfessorMe(BaseUser):
     teacher: dict | None = None
+    
+class UserProfessor(BaseUser, BaseProfessor):
     pass

@@ -5,6 +5,7 @@ from pony.orm.core import TransactionIntegrityError
 from src import models, schemas
 
 
+
 class StudentsService:
 
     def __init__(self):
@@ -54,4 +55,22 @@ class StudentsService:
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
     
+    def modify_student(self,student_in:schemas.Student):
+        with db_session:
+            try:
+                student = select(s for s in models.Student if s.dni == student_in.dni)[:]
+                course = select(c for c in models.Course if c.course_name == student_in.course)[:]
+                if not course:
+                    raise HTTPException(status_code=404, detail="Curso no encontrado")
+                if student:
+                    student[0].set(dni=student_in.dni, email=student_in.email, firstName=student_in.firstName, lastName=student_in.lastName, courses=course[0])
+                    return student[0].to_dict()
+                else:
+                    raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+            except TransactionIntegrityError as e:
+                print(f"Error de integridad transaccional: {e}")
+    
+
+
+
 

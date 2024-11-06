@@ -62,5 +62,22 @@ def get_today_course_attendance(
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail="Error inesperado al obtener las asistencias"
+            detail="Error inesperado al obtener las asistencias")
+    
+@router.get("/courses", response_model=dict)
+async def get_all_courses(current_user=Depends(get_current_user)):
+    try:
+        list_of_courses = service.get_courses()
+        return {
+            "success": True,
+            # Using to_dict() instead of to_list()
+            "courses": [course.to_dict() for course in list_of_courses]
+        }
+    except HTTPException as http_ex:
+        raise http_ex
+    except Exception as e:
+        print(f"Unexpected error while fetching courses: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="No fue posible obtener los datos de los cursos."
         )

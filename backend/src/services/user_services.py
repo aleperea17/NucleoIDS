@@ -32,48 +32,66 @@ class UsersService:
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
                 raise HTTPException(
-                    status_code=400, detail="Error de integridad al crear el usuario.")
+                    status_code=400,
+                    detail="Error de integridad al crear el usuario.")
             except Exception as e:
                 print(f"Error al crear el usuario: {e}")
                 raise HTTPException(
                     status_code=500, detail="Error al crear el usuario.")
 
-    def get_users(self,
-                  page: int = Query(1, ge=1, description="Número de página"),
+    def get_users(self, page: int = Query(1, ge=1, description="Número de página"),
                   count: int = Query(
-                      10, ge=1, le=100, description="Número de usuarios por página"),
-                  sort: Optional[str] = Query(
-                      None, description="Ordenar por campo (e.g., 'username', 'email')"),
-                  order: Optional[str] = Query(
-                      "asc", regex="^(asc|desc)$", description="Orden asc o desc"),
-                  role: Optional[models.Roles] = Query(None, description="Filtrar por rol")):
+            10, ge=1, le=100, description="Número de usuarios por página"),
+            sort: Optional[str] = Query(
+            None, description="Ordenar por campo (e.g., 'username', 'email')"),
+            order: Optional[str] = Query(
+            "asc", regex="^(asc|desc)$", description="Orden asc o desc"),
+            role: Optional[models.Roles] = Query(None, description="Filtrar por rol")):
         with db_session:
-            users = select(p for p in models.User)[:]
+            # Construir la consulta base
             query = select(u for u in models.User)
 
+            # Aplicar filtro por rol si se especifica
             if role:
                 query = query.filter(lambda u: u.role == role)
 
+            # Aplicar ordenamiento si se especifica
             if sort:
                 if order == "asc":
                     query = query.order_by(lambda u: getattr(u, sort))
                 else:
                     query = query.order_by(lambda u: desc(getattr(u, sort)))
 
+            # Obtener el total de registros antes de la paginación
             total = query.count()
+
+            # Aplicar paginación
             users = query.page(page, count)
 
-            users_conversion = [
-                {key: str(value) if isinstance(value, UUID)
-                 else value for key, value in user.to_dict().items()}
-                for user in users
-            ]
-        return {
-            "page": page,
-            "count": len(users_conversion),
-            "total": total,
-            "users": users_conversion,
-        }
+            # Convertir usuarios a diccionario incluyendo información del profesor
+            users_conversion = []
+            for user in users:
+                user_dict = {
+                    key: str(value) if isinstance(value, UUID) else value
+                    for key, value in user.to_dict().items()
+                }
+
+                # Si el usuario tiene rol de profesor, incluir la información de teacher
+                if hasattr(user, 'teacher') and user.teacher is not None:
+                    teacher_dict = {
+                        key: str(value) if isinstance(value, UUID) else value
+                        for key, value in user.teacher.to_dict().items()
+                    }
+                    user_dict['teacher'] = teacher_dict
+
+                users_conversion.append(user_dict)
+
+            return {
+                "page": page,
+                "count": len(users_conversion),
+                "total": total,
+                "users": users_conversion,
+            }
 
     def create_user_teacher(self, user_input: schemas.UserProfessor, course_name: str):
         with db_session:
