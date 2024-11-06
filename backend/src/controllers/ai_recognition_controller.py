@@ -45,11 +45,12 @@ def mark_attendance(course_id:str,  base64_string: schemas.ImageRequest):
         attendance = attendance_service.markAttendance(course_id,student["dni"])
         print(attendance)
         return {
-            "message": 'Se ha registrado la asistencia del estudiante {},{} correctamente. '.format(student["lastName"],student["firstName"]),
+            "message": 'Se ha registrado la asistencia del estudiante correctamente. ',
+            "data":student,
             "success": True
             }
     except HTTPException as e:
-        raise {
+        return {
             "message": f'{e.detail}',
             "success": False, }
     except Exception as e:
