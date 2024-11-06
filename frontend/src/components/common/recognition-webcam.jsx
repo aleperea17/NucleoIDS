@@ -1,16 +1,41 @@
 import axios from "axios";
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "react-daisyui";
+import { fetcher } from "../../fetcher/fetcher";
 
+const markAttendance = async (img) => {
+	try {
+		const response = await fetcher.post(
+			"/students/mark-attendance",
+			{
+				image_base64: img,
+			},
+			{
+				params: {
+					course_id: "bc6d2bf8-2aa4-410b-91cf-a341d331472a",
+				},
+			},
+		);
+		console.log("ATTANDANCE RESPONSE", response);
+		if (response.data.success) {
+			return response.data.message;
+		}
+		return false;
+	} catch (error) {
+		return false;
+	}
+};
 export default function RecognitionWebcam() {
 	const [isWebcamActive, setIsWebcamActive] = useState(false);
 	const [error, setError] = useState(null);
 	const [faceCoords, setFaceCoords] = useState(null);
+	const [shouldContinue, setShouldContinue] = useState(true);
 	const videoRef = useRef(null);
 	const canvasRef = useRef(null);
 	const streamRef = useRef(null);
 	const intervalRef = useRef(null);
 
+	console.log(shouldContinue);
 	const getFaceLocation = async (img) => {
 		try {
 			const url = `${import.meta.env.VITE_PUBLIC_API_URL}/students/detectFace`;
@@ -22,9 +47,11 @@ export default function RecognitionWebcam() {
 
 			if (success) {
 				setFaceCoords(response.data.coords);
+				const img = captureImage();
+				return img;
 			} else {
 				setFaceCoords(null);
-				return;
+				return null;
 			}
 		} catch (err) {
 			console.error("Error detecting face:", err);
@@ -126,11 +153,26 @@ export default function RecognitionWebcam() {
 	useEffect(() => {
 		let timeoutId;
 
-		const executeInterval = () => {
+		const executeInterval = async () => {
+			if (!shouldContinue) return;
 			console.log("Timeout executed");
 			const img = captureImage();
+			let imgWithFace = null;
 			if (img) {
-				getFaceLocation(img);
+				imgWithFace = await getFaceLocation(img);
+			}
+			console.log(imgWithFace);
+			if (imgWithFace) {
+				const result = await markAttendance(img);
+				console.log(result);
+				if (result) {
+					setShouldContinue(false);
+					clearTimeout(timeoutId);
+					toast.success(result);
+					// deactivateWebcam();
+					return;
+				}
+				toast.error("No se ha detectado la asistencia");
 			}
 			timeoutId = setTimeout(executeInterval, 2000); // Ejecuta cada 2 segundos
 		};
