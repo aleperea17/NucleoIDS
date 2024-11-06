@@ -1,11 +1,13 @@
+from pony.orm.dbapiprovider import UUID
 from pydantic import BaseModel
 from typing import List
 from src.models import Roles
 from datetime import date
 
+
 class BaseProfessor(BaseModel):
     dni: str
-    phone: str 
+    phone: str
     address: str
     hire_date: date
 
@@ -13,8 +15,11 @@ class BaseProfessor(BaseModel):
         from_attributes = True
 
 # Esquema para crear un nuevo profesor
+
+
 class ProfessorCreate(BaseProfessor):
     pass
+
 
 class ProfessorUpdate(BaseModel):
     username: str | None = None
@@ -25,6 +30,7 @@ class ProfessorUpdate(BaseModel):
     phone: str | None = None
     address: str | None = None
     hire_date: date | None = None
+    courseId: UUID | None = None
 
 
 class BaseUser(BaseModel):
@@ -39,13 +45,17 @@ class BaseUser(BaseModel):
         from_attributes = True
         use_enum_values = True
 
+
 class UserCreate(BaseUser):
     password: str
+
 
 class UserProfessor(UserCreate, BaseProfessor):
     pass
 
 # Modelo de entrada
+
+
 class LoginRequest(BaseModel):
     username: str | None = None
     email: str | None = None
@@ -53,24 +63,27 @@ class LoginRequest(BaseModel):
 
 # Modelo para recibir la imagen en base64 del front.
 
+
 class ImageRequest(BaseModel):
     image_base64: str
 
+
 class CourseCreate(BaseModel):
     course_name: str
-    dni_teacher: str | None = None 
-    
+    dni_teacher: str | None = None
+
 
 class Student(BaseModel):
-    dni : str
-    email : str
+    dni: str
+    email: str
     firstName: str
-    lastName : str
+    lastName: str
     course: str
 
 
 class TokenVerificationRequest(BaseModel):
     token: str
+
 
 class UserProfessor(BaseUser, BaseProfessor):
     pass
