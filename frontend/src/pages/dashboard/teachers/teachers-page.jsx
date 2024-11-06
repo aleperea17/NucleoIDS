@@ -18,6 +18,7 @@ import useUsers from "../../../hooks/use-user";
 import { MapPinIcon, PencilIcon, PhoneIcon } from "lucide-react";
 import EditTeacherModal from "../../../components/teachers/edit-teacher-modal";
 import { render } from "react-dom";
+import { updateOneTeacher } from "../../../fetcher/mutations";
 
 export default function TeachersPage() {
 	const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
@@ -111,7 +112,10 @@ export default function TeachersPage() {
 			render: (_, row) => {
 				const [isOpen, setIsOpen] = useState(false);
 				const { email, firstName, lastName, ...rest } = row;
-				const handleSubmit = (data) => { };
+				const handleSubmit = async (data) => {
+					await updateOneTeacher(data);
+				};
+				console.log(rest);
 				return (
 					<>
 						<Tooltip message="Editar">
@@ -132,10 +136,11 @@ export default function TeachersPage() {
 								phone: row.teacher.phone,
 								hire_date: row.teacher.hire_date,
 								address: row.teacher.address,
+								courseId: row.teacher.course ?? null,
 							}}
 							isOpen={isOpen}
 							onClose={() => setIsOpen(false)}
-							onSubmit={() => { }}
+							onSubmit={handleSubmit}
 						/>
 					</>
 				);

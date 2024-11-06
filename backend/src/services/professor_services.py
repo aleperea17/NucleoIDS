@@ -4,6 +4,7 @@ import uuid
 from pony.orm.core import TransactionIntegrityError
 from src import models, schemas
 
+
 class ProfessorService:
     def __init__(self):
         pass
@@ -19,8 +20,9 @@ class ProfessorService:
                     hire_date=professor_data.hire_date,
                 )
                 print("Profesor creado correctamente.")
-                    
-                teacher_dict = teacher.to_dict(exclude=['id'])  # Si necesitas excluir 'id' u otros campos
+
+                # Si necesitas excluir 'id' u otros campos
+                teacher_dict = teacher.to_dict(exclude=['id'])
                 return teacher_dict
 
             except TransactionIntegrityError as e:
@@ -32,7 +34,7 @@ class ProfessorService:
                 raise HTTPException(
                     status_code=500, detail="Error al crear el profesor.")
 
-    def get_teacher(self, dni:str):
+    def get_teacher(self, dni: str):
         with db_session:
             try:
                 teacher = select(t for t in models.Teacher if t.dni == dni)[:]
@@ -45,13 +47,14 @@ class ProfessorService:
                 print(f"Error al crear el profesor: {e}")
                 raise HTTPException(
                     status_code=500, detail="Error al obtener el profesor.")
-            
-    def update_teacher(self, dni: str, update_data: schemas.UserProfessor) -> dict:
+
+    def update_teacher(self, dni: str, update_data: schemas.ProfessorUpdate) -> dict:
         with db_session:
             try:
                 teacher = models.Teacher.get(dni=dni)
                 if not teacher:
-                    raise HTTPException(status_code=404, detail="Profesor no encontrado")
+                    raise HTTPException(
+                        status_code=404, detail="Profesor no encontrado")
 
                 # Actualizar datos en la tabla Teacher
                 teacher.phone = update_data.phone
@@ -65,20 +68,51 @@ class ProfessorService:
                     user.lastName = update_data.lastName
                     user.email = update_data.email
 
+                if update_data.courseId is None:
+                    # Si courseId es None, buscar si el profesor tiene un curso asignado y desconectarlo
+                    current_course = models.Course.get(teacher=teacher)
+                    if current_course:
+                        current_course.teacher = None
+                        return {"message": "Profesor actualizado y desvinculado del curso correctamente"}
+                else:
+                    # Si se proporciona un nuevo courseId
+                    new_course = models.Course.get(id=update_data.courseId)
+                    if not new_course:
+                        raise HTTPException(
+                            status_code=404, detail="Curso no encontrado")
+
+                    # Si el nuevo curso ya tiene un profesor diferente
+                    if new_course.teacher and new_course.teacher.dni != dni:
+                        raise HTTPException(
+                            status_code=400,
+                            detail="El curso ya está asignado a otro profesor"
+                        )
+
+                    # Desconectar el curso actual del profesor si existe
+                    current_course = models.Course.get(teacher=teacher)
+                    if current_course:
+                        current_course.teacher = None
+
+                    # Asignar el nuevo curso al profesor
+                    new_course.teacher = teacher
+                    return {"message": "Profesor actualizado y asignado al nuevo curso correctamente"}
+
                 return {"message": "Profesor actualizado correctamente"}
-                
+
             except Exception as e:
-                print(f"Error al actualizar el profesor: {e}")  # Esto muestra el error en la consola
+                # Esto muestra el error en la consola
+                print(f"Error al actualizar el profesor: {e}")
                 raise HTTPException(
                     status_code=500, detail="Error inesperado al actualizar el profesor.")
-    
+
     def get_teacher(self, dni: str) -> dict:
         with db_session:
             try:
                 # Obtener el profesor por DNI
                 teacher = models.Teacher.get(dni=dni)
                 if not teacher:
-                    raise HTTPException(status_code=404, detail="Profesor no encontrado")
+                    raise HTTPException(
+                        status_code=404, detail="Profesor no encontrado")
 
                 # Crear el diccionario de respuesta
                 teacher_data = {
@@ -104,13 +138,14 @@ class ProfessorService:
                 print(f"Error al obtener el profesor: {e}")
                 raise HTTPException(
                     status_code=500, detail="Error al obtener el profesor.")
-    
+
     def delete_teacher(self, dni: str) -> dict:
         with db_session:
             # Buscar el profesor con el DNI especificado
             teacher = models.Teacher.get(dni=dni)
             if not teacher:
-                raise HTTPException(status_code=404, detail="Profesor no encontrado")
+                raise HTTPException(
+                    status_code=404, detail="Profesor no encontrado")
 
             try:
                 # Eliminar cursos asociados al profesor
@@ -119,11 +154,11 @@ class ProfessorService:
                         # Eliminar asistencias relacionadas con el curso
                         for attendance in course.attendance:
                             attendance.delete()
-                        
+
                         # Eliminar relación del curso con estudiantes
                         for student in course.students:
                             student.courses.remove(course)
-                        
+
                         course.delete()
 
                 # Eliminar usuario asociado al profesor, si existe
@@ -135,7 +170,7 @@ class ProfessorService:
                 return {"message": "Profesor y todos los datos relacionados eliminados correctamente"}
 
             except Exception as e:
-                print(f"Error al eliminar el profesor y sus datos relacionados: {e}")
-                raise HTTPException(status_code=500, detail="Error al eliminar el profesor y sus datos relacionados.")
-
-    
+                print(
+                    f"Error al eliminar el profesor y sus datos relacionados: {e}")
+                raise HTTPException(
+                    status_code=500, detail="Error al eliminar el profesor y sus datos relacionados.")

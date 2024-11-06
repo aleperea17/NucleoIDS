@@ -36,12 +36,14 @@ def register_professor(professor: schemas.ProfessorCreate, current_user=Depends(
             "success": False,
         }
 
+
 class UpdateMessage(BaseModel):
     message: str
     success: bool
 
+
 @router.put("/update/{dni}", response_model=UpdateMessage)
-def update_professor(dni: str, professor_update: schemas.UserProfessor, current_user=Depends(get_current_user)):
+def update_professor(dni: str, professor_update: schemas.ProfessorUpdate, current_user=Depends(get_current_user)):
     try:
         update_result = service.update_teacher(dni, professor_update)
         return {"message": update_result["message"], "success": True}
@@ -51,6 +53,7 @@ def update_professor(dni: str, professor_update: schemas.UserProfessor, current_
     except Exception as e:
         print(f"Error inesperado al actualizar el profesor: {e}")
         return {"message": "Error inesperado al actualizar el profesor.", "success": False}
+
 
 @router.get("/get/{dni}", response_model=schemas.UserProfessor)
 def get_professor(dni: str, current_user=Depends(get_current_user)):
@@ -64,6 +67,7 @@ def get_professor(dni: str, current_user=Depends(get_current_user)):
         print(f"Error inesperado al obtener el profesor: {e}")
         raise HTTPException(
             status_code=500, detail="Error inesperado al obtener el profesor.")
+
 
 @router.delete("/{dni}", status_code=200)
 def delete_professor(dni: str, current_user=Depends(get_current_user)):
