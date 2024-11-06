@@ -27,12 +27,10 @@ export const router = createBrowserRouter([
 	{
 		path: "/modifystudent",
 		element: <ModifyStudent />,
-
 	},
 	{
 		path: "/atthistory",
 		element: <AttHistory />,
-
 	},
 	{
 		path: "/auth",
@@ -56,11 +54,14 @@ export const router = createBrowserRouter([
 	{
 		path: "/",
 		element: (
-			<AuthProvider>
-				<ProtectedRoute>
-					<Outlet />
-				</ProtectedRoute>
-			</AuthProvider>
+			<>
+				<AuthProvider>
+					<ProtectedRoute>
+						<Outlet />
+					</ProtectedRoute>
+				</AuthProvider>
+				<Toaster />
+			</>
 		),
 		children: [
 			{

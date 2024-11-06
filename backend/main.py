@@ -27,8 +27,8 @@ app.add_middleware(
 
 # Lista de Rutas
 
-#Talleres
-app.include_router(courses_router, prefix="/courses", tags=["talleres"]) 
+# Talleres
+app.include_router(courses_router, prefix="/courses", tags=["talleres"])
 
 # Auth
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
@@ -39,7 +39,7 @@ app.include_router(users_router, prefix="/users", tags=["usuarios"])
 app.include_router(ai_router, prefix="/students", tags=["estudiantes"])
 
 # Profesores
-app.include_router(professors_router, prefix="/profesores", tags=["profesores"]) 
+app.include_router(professors_router, prefix="/teachers", tags=["profesores"])
 
 # Personalizar el esquema de seguridad en OpenAPI para usar Bearer tokens
 
