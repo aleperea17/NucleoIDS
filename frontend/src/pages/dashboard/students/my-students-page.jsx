@@ -8,11 +8,21 @@ import Table from "../../../components/table/Table";
 import useUsers from "../../../hooks/use-user";
 import StudentsCreateForm from "./students-create-form";
 import { columns } from "./table-columns";
+import useProfessorCourse from "../../../hooks/useCourse";
+import { useAuth } from "../../../hooks/use-auth";
+import { Navigate } from "react-router-dom";
 
 export default function MyStudentsPage() {
   const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
     role: "STUDENT",
   });
+
+  const { user } = useAuth();
+
+  console.log(user);
+  const { course, loading: isLoadingProfessorCourse } = useProfessorCourse(
+    user.role === "TEACHER" ? user.teacher.id : undefined,
+  );
 
   const methods = useForm();
 
@@ -33,6 +43,11 @@ export default function MyStudentsPage() {
 
   const { Dialog, handleShow, handleHide } = Modal.useDialog();
 
+  if (!course || isLoadingProfessorCourse)
+    return (
+      <span className="loading loading-spinner text-primary w-52 mx-auto mt-10"></span>
+    );
+  if (!course || user.role !== "TEACHER") return <Navigate to="/dashboard" />;
   return (
     <section className="px-10 py-5">
       <Heading
@@ -83,7 +98,10 @@ export default function MyStudentsPage() {
         </FormProvider>
       </Dialog>
       <section className="shadow-lg rounded-lg">
-        <Table data={data ? data.users : []} columns={columns} />
+        <Table
+          data={course && course.Estudiantes ? course.Estudiantes : []}
+          columns={columns}
+        />
       </section>
     </section>
   );

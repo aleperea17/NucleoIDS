@@ -16,6 +16,8 @@ class StudentBasic(BaseModel):
     id: UUID
     firstName: str
     lastName: str
+    dni: str
+    email: str
 
 
 class AttendanceResponse(BaseModel):

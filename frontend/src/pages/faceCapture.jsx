@@ -6,6 +6,19 @@ import { useAuth } from "../hooks/use-auth";
 import useSWR from "swr";
 import { fetcher } from "../fetcher/fetcher";
 
+const Skeleton = () => {
+	return (
+		<tr>
+			<td class="animate-pulse">
+				<div class="h-4 bg-gray-300 rounded w-24"></div>
+			</td>
+			<td class="animate-pulse">
+				<div class="h-4 bg-gray-300 rounded w-24"></div>
+			</td>
+		</tr>
+	);
+};
+
 export default function FaceCapture() {
 	const [isScanning, setIsScanning] = useState(false);
 	const { loading, user } = useAuth();
@@ -29,7 +42,7 @@ export default function FaceCapture() {
 							String(today.getDate()).padStart(2, "0"),
 					},
 				});
-				return response.data.attendances;
+				return response.data.attendances.map(({ student }) => student);
 			} catch (error) {
 				console.log(error);
 			}
@@ -112,29 +125,34 @@ export default function FaceCapture() {
 												<th className="bg-primary text-white">DNI</th>
 											</tr>
 										</thead>
-										<tbody>
-											{attendance_data &&
-												attendance_data.map(({ student }) => (
-													<tr key={student.id}>
-														{/* <td> */}
-														{/* 	<div className="avatar"> */}
-														{/* 		<div className="w-10 rounded-full"> */}
-														{/* 			<img */}
-														{/* 				src={student.image} */}
-														{/* 				alt={`Foto de ${student.name}`} */}
-														{/* 				width={40} */}
-														{/* 				height={40} */}
-														{/* 				className="rounded-full" */}
-														{/* 			/> */}
-														{/* 		</div> */}
-														{/* 	</div> */}
-														{/* </td> */}
-														<td>
-															{student.firstName} {student.lastName}
-														</td>
-														<td>{student.dni}</td>
-													</tr>
-												))}
+										<tbody className="relative">
+											{attendance_data ? (
+												attendance_data.map(
+													({ firstName, id, dni, lastName }) => (
+														<tr key={id}>
+															{/* <td> */}
+															{/* 	<div className="avatar"> */}
+															{/* 		<div className="w-10 rounded-full"> */}
+															{/* 			<img */}
+															{/* 				src={student.image} */}
+															{/* 				alt={`Foto de ${student.name}`} */}
+															{/* 				width={40} */}
+															{/* 				height={40} */}
+															{/* 				className="rounded-full" */}
+															{/* 			/> */}
+															{/* 		</div> */}
+															{/* 	</div> */}
+															{/* </td> */}
+															<td>
+																{firstName} {lastName}
+															</td>
+															<td>{dni}</td>
+														</tr>
+													),
+												)
+											) : (
+												<Skeleton />
+											)}
 										</tbody>
 									</table>
 								</div>
