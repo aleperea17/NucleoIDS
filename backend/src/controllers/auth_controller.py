@@ -1,5 +1,6 @@
 from fastapi import HTTPException, APIRouter, status, Depends
 from pony.orm import *
+from pony.orm import db_session
 from src import models, schemas
 from jose import jwt, JWTError, ExpiredSignatureError
 from src.services.user_services import UsersService
@@ -157,6 +158,30 @@ async def login(request: schemas.LoginRequest = Depends()):
     }
 
 
-@router.get("/me", response_model=schemas.BaseUser)
-async def get_me(current_user: models.User = Depends(get_current_user)):
-    return current_user
+@router.get("/me")
+@db_session
+def get_me(current_user=Depends(get_current_user)):
+    user_dict = {
+        "id": str(current_user.id),
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role
+    }
+
+    print(user_dict)
+    if current_user.role == "TEACHER":
+        # Explicitly load and convert the 'teacher' relationship to a dictionary
+        teacher = models.Teacher.get(user=current_user.id)
+        if teacher:
+            user_dict["teacher"] = {
+                "id": teacher.id,
+                "dni": teacher.dni,
+                "phone": teacher.phone,
+                "address": teacher.address,
+                "hire_date": teacher.hire_date
+            }
+        print(user_dict)
+
+        return user_dict
+
+    return user_dict

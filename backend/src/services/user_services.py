@@ -11,6 +11,7 @@ from src.services.courses_services import CourseService
 professor_service = ProfessorService()
 course_service = CourseService()
 
+
 class UsersService:
     def __init__(self):
         pass
@@ -74,19 +75,22 @@ class UsersService:
             "users": users_conversion,
         }
 
-    def create_user_teacher(self,user_input: schemas.UserProfessor, course_name:str):
+    def create_user_teacher(self, user_input: schemas.UserProfessor, course_name: str):
         with db_session:
             try:
                 course = course_service.get_course(course_name)
-                
+
                 existing_professor = models.Teacher.get(dni=user_input.dni)
                 if existing_professor:
-                    raise HTTPException(status_code=400, detail=f"Ya existe un profesor con el DNI {user_input.dni}.")
-                
-                existing_user = models.User.get(username=user_input.username) or models.User.get(email=user_input.email)
+                    raise HTTPException(
+                        status_code=400, detail=f"Ya existe un profesor con el DNI {user_input.dni}.")
+
+                existing_user = models.User.get(
+                    username=user_input.username) or models.User.get(email=user_input.email)
                 if existing_user:
-                    raise HTTPException(status_code=400, detail=f"Ya existe el usuario con username: {user_input.username}.")
-                                
+                    raise HTTPException(
+                        status_code=400, detail=f"Ya existe el usuario con username: {user_input.username}.")
+
                 professor = models.Teacher(
                     dni=user_input.dni,
                     phone=user_input.phone,
@@ -102,10 +106,10 @@ class UsersService:
                     lastName=user_input.lastName,
                     role=user_input.role,
                     teacher=professor)
-                
+
                 professor.user = user
-                
-                return {"Se ha creado el usuario de profesor.":user.id , "success":True}
+
+                return {"Se ha creado el usuario de profesor.": user.id, "success": True}
             except Exception as e:
                 raise e
 
@@ -113,11 +117,12 @@ class UsersService:
         with db_session:
             try:
                 user_id = UUID(user_id)  # Convertir el user_id a UUID
-                user = select(u for u in models.User if u.id == user_id).first()
+                user = select(u for u in models.User if u.id ==
+                              user_id).first()
                 return user if user else None
             except Exception as e:
                 return None
-    
+
     def search_user(self, username: Optional[str], email: Optional[str], password: str) -> models.User:
         with db_session:
             user = select(u for u in models.User if (

@@ -1,41 +1,49 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "react-daisyui";
 import { fetcher } from "../../fetcher/fetcher";
+import toast from "react-hot-toast";
 
-const markAttendance = async (img) => {
-	try {
-		const response = await fetcher.post(
-			"/students/mark-attendance",
-			{
-				image_base64: img,
-			},
-			{
-				params: {
-					course_id: "bc6d2bf8-2aa4-410b-91cf-a341d331472a",
-				},
-			},
-		);
-		console.log("ATTANDANCE RESPONSE", response);
-		if (response.data.success) {
-			return response.data.message;
-		}
-		return false;
-	} catch (error) {
-		return false;
-	}
-};
-export default function RecognitionWebcam() {
+export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 	const [isWebcamActive, setIsWebcamActive] = useState(false);
 	const [error, setError] = useState(null);
 	const [faceCoords, setFaceCoords] = useState(null);
-	const [shouldContinue, setShouldContinue] = useState(true);
+	const [isSuccessfulMark, setIsSuccessfulMark] = useState(false);
 	const videoRef = useRef(null);
 	const canvasRef = useRef(null);
 	const streamRef = useRef(null);
 	const intervalRef = useRef(null);
 
-	console.log(shouldContinue);
+	const markAttendance = async (img) => {
+		try {
+			const response = await fetcher.post(
+				"/students/mark-attendance",
+				{
+					image_base64: img,
+				},
+				{
+					params: {
+						course_id: courseId,
+					},
+				},
+			);
+			console.log("ATTANDANCE RESPONSE", response);
+			if (response.data.data) {
+				onMarkAttendance(response.data.data);
+				// setStudents([...students, response.data.data]);
+				return response.data.message;
+			}
+			if (response.data.success) {
+				return response.data.message;
+			} else if (response.data.status_code === 203) {
+				return response.data.detail.message;
+			}
+			return false;
+		} catch (error) {
+			return false;
+		}
+	};
+
 	const getFaceLocation = async (img) => {
 		try {
 			const url = `${import.meta.env.VITE_PUBLIC_API_URL}/students/detectFace`;
@@ -130,7 +138,7 @@ export default function RecognitionWebcam() {
 					const [top, right, bottom, left] = faceCoords;
 					const width = right - left;
 					const height = bottom - top;
-					ctx.strokeStyle = "red";
+					ctx.strokeStyle = isSuccessfulMark ? "green" : "red";
 					ctx.lineWidth = 3;
 					ctx.strokeRect(left, top, width, height);
 				}
@@ -154,25 +162,26 @@ export default function RecognitionWebcam() {
 		let timeoutId;
 
 		const executeInterval = async () => {
-			if (!shouldContinue) return;
 			console.log("Timeout executed");
 			const img = captureImage();
 			let imgWithFace = null;
 			if (img) {
 				imgWithFace = await getFaceLocation(img);
 			}
-			console.log(imgWithFace);
 			if (imgWithFace) {
 				const result = await markAttendance(img);
-				console.log(result);
 				if (result) {
-					setShouldContinue(false);
-					clearTimeout(timeoutId);
+					console.log(result);
+					setIsSuccessfulMark(true);
 					toast.success(result);
+					// await new Promise((resolve) => setTimeout(resolve, 500));
+					// setIsSuccessfulMark(false);
+					// clearTimeout(timeoutId);
+
 					// deactivateWebcam();
-					return;
+				} else {
+					toast.error("No se ha detectado la asistencia");
 				}
-				toast.error("No se ha detectado la asistencia");
 			}
 			timeoutId = setTimeout(executeInterval, 2000); // Ejecuta cada 2 segundos
 		};
