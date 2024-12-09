@@ -19,28 +19,34 @@ import { MapPinIcon, PencilIcon, PhoneIcon, TrashIcon, X } from "lucide-react";
 import EditTeacherModal from "../../../components/teachers/edit-teacher-modal";
 import { render } from "react-dom";
 import { deleteOneTeacher, updateOneTeacher } from "../../../fetcher/mutations";
+import TeacherForm from "../../../components/teachers/form/teacher-form";
+import { fetcher } from "../../../fetcher/fetcher";
+import useSWR from "swr";
+import { useAuth } from "../../../hooks/use-auth";
 
 export default function TeachersPage() {
 	const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
 		role: "TEACHER",
 	});
 
-	const methods = useForm();
-
-	const onFormSubmit = async (data) => {
-		const { confirmPassword, ...rest } = data;
-		const response = await axios.post("http://localhost:8000/auth/register", {
-			...rest,
-			role: "TEACHER",
-		});
-		if (response.data.success) {
-			toast.success("Profesor creado con éxito", { position: "top-right" });
-			mutate();
-			methods.reset();
-		} else {
-			toast.error("Algo salió mal!", { position: "top-right" });
+	const getCoursesFetcher = async (url) => {
+		try {
+			const response = await fetcher.get("/courses/courses");
+			const list_of_courses = response.data.courses.map((course) => ({
+				label: course.course_name,
+				value: course.id,
+			}));
+			return list_of_courses;
+		} catch (error) {
+			throw error;
 		}
 	};
+	const { user } = useAuth();
+	const { data: courses_list } = useSWR(
+		user.role === "ADMIN" ? "/courses" : null,
+		getCoursesFetcher,
+	);
+	const methods = useForm();
 
 	const roleMap = {
 		TEACHER: "Profesor",
@@ -51,14 +57,8 @@ export default function TeachersPage() {
 			accessor: "firstName",
 			render: (name, row) => (
 				<div className="flex items-center space-x-3 truncate">
-					<Mask
-						variant="squircle"
-						src="https://img.daisyui.com/images/profile/demo/2@94.webp"
-					/>
-					<div>
-						<div className="font-bold">
-							{name} {row.lastName}
-						</div>
+					<div className="font-bold">
+						{name} {row.lastName}
 					</div>
 				</div>
 			),
@@ -227,26 +227,36 @@ export default function TeachersPage() {
 				}
 			/>
 			<Dialog>
-				<FormProvider {...methods}>
-					<form onSubmit={methods.handleSubmit(onFormSubmit)}>
-						<Modal.Header className="font-bold">
-							Crear un nuevo profesor
-						</Modal.Header>
-						<Modal.Body>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<TeacherCreateForm />
-							</div>
-						</Modal.Body>
-						<Modal.Actions>
-							<Button onClick={handleHide} type="button" color="error">
-								Cancelar
-							</Button>
-							<Button type="submit" color="primary">
-								Crear
-							</Button>
-						</Modal.Actions>
-					</form>
-				</FormProvider>
+				<TeacherForm
+					onSubmit={async (data) => {
+						try {
+							const { course, ...rest } = data;
+							const response = await fetcher.post(
+								"/auth/register-user-professor",
+								{
+									...rest,
+									role: "TEACHER",
+								},
+								{
+									params: {
+										course_name: courses_list.find((c) => c.value === course),
+									},
+								},
+							);
+							if (response.data.success) {
+								toast.success(
+									response.data.message ||
+									"Se ha creado el profesor con éxito!",
+								);
+							} else {
+								toast.error(response.data.message || "Algo salió mal");
+							}
+						} catch (error) {
+							toast.error("Algo salió mal");
+						}
+					}}
+					defaultValues={{}}
+				/>
 			</Dialog>
 			<section className="shadow-lg rounded-lg">
 				<Table data={data ? data.users : []} columns={columns} />

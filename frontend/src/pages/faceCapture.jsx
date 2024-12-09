@@ -108,7 +108,8 @@ export default function FaceCapture() {
 									courseId={course && course.Taller ? course.Taller.id : null}
 									onMarkAttendance={(newAttendance) => {
 										mutate([...attendance_data, newAttendance]);
-										setAttendanceList([...attendanceList, newAttendance]);
+										console.log("INSIDE ONMARKATTENDANCE FUNCTION");
+										// setAttendanceList([...attendanceList, newAttendance]);
 									}}
 								/>
 							</div>
@@ -130,19 +131,6 @@ export default function FaceCapture() {
 												attendance_data.map(
 													({ firstName, id, dni, lastName }) => (
 														<tr key={id}>
-															{/* <td> */}
-															{/* 	<div className="avatar"> */}
-															{/* 		<div className="w-10 rounded-full"> */}
-															{/* 			<img */}
-															{/* 				src={student.image} */}
-															{/* 				alt={`Foto de ${student.name}`} */}
-															{/* 				width={40} */}
-															{/* 				height={40} */}
-															{/* 				className="rounded-full" */}
-															{/* 			/> */}
-															{/* 		</div> */}
-															{/* 	</div> */}
-															{/* </td> */}
 															<td>
 																{firstName} {lastName}
 															</td>

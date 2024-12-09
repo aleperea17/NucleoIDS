@@ -71,7 +71,7 @@ class CourseService():
                     detail=f"No se encontró un curso asociado al profesor con ID {professor_id}"
                 )
             students = [{"dni": s.dni, "firstName": s.firstName,
-                         "lastName": s.lastName} for s in course.students]
+                         "lastName": s.lastName, "email": s.email} for s in course.students]
 
             return professor.to_dict(), course.to_dict(), students
 

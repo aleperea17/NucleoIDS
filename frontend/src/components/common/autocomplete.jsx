@@ -12,6 +12,7 @@ const Autocomplete = ({
 	item,
 	name,
 	control,
+	disabled = false,
 	value: defaultValue,
 }) => {
 	const {
@@ -103,13 +104,14 @@ const Autocomplete = ({
 				defaultValue={defaultValue ? defaultValue.label : undefined}
 				ref={inputRef}
 				type="text"
+				disabled={disabled}
 				placeholder={placeholder}
 				value={inputValue}
 				onChange={handleChange}
 				className="w-full"
 			/>
 
-			{value && (
+			{value && !disabled && (
 				<Button
 					color="error"
 					className="px-1"

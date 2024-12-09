@@ -11,12 +11,9 @@ import { columns } from "./table-columns";
 import useProfessorCourse from "../../../hooks/useCourse";
 import { useAuth } from "../../../hooks/use-auth";
 import { Navigate } from "react-router-dom";
+import { fetcher } from "../../../fetcher/fetcher";
 
 export default function MyStudentsPage() {
-  const { data, isLoading, error, mutate, helpers, count, page } = useUsers({
-    role: "STUDENT",
-  });
-
   const { user } = useAuth();
 
   console.log(user);
@@ -26,18 +23,33 @@ export default function MyStudentsPage() {
 
   const methods = useForm();
 
-  const onFormSubmit = async (data) => {
-    const { confirmPassword, ...rest } = data;
-    const response = await axios.post("http://localhost:8000/users/student", {
-      ...rest,
-    });
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        student_input: {
+          dni: data.dni,
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          course: data.courseId,
+        },
+        base64_string: {
+          image_base64: data.image_base64,
+        },
+      };
 
-    if (response.data.dni) {
-      toast.success("Alumno creado con éxito", { position: "top-right" });
-      mutate();
+      const response = await fetcher.post("/students/train", payload);
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
       methods.reset();
-    } else {
-      toast.error("Algo salió mal!", { position: "top-right" });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Algo salió mal!");
+      // Handle error
     }
   };
 
@@ -58,32 +70,21 @@ export default function MyStudentsPage() {
             <Button onClick={handleShow} color="primary">
               Añadir Estudiante
             </Button>
-
-            <Select
-              value={count}
-              onChange={(event) => {
-                helpers.changeCount(parseInt(event.target.value));
-              }}
-            >
-              <option value={"default"} disabled defaultValue={"default"}>
-                Cantidad de estudiantes
-              </option>
-              <option value={1}>1</option>
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-            </Select>
           </div>
         }
       />
       <Dialog>
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onFormSubmit)}>
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
             <Modal.Header className="font-bold">
               Crear un nuevo estudiante
             </Modal.Header>
             <Modal.Body>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <StudentsCreateForm />
+                <StudentsCreateForm
+                  taller={{ value: course.Taller.id, label: "Robótica" }}
+                  options={[]}
+                />
               </div>
             </Modal.Body>
             <Modal.Actions>

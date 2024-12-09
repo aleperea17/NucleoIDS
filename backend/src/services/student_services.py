@@ -55,22 +55,32 @@ class StudentsService:
             except TransactionIntegrityError as e:
                 print(f"Error de integridad transaccional: {e}")
     
-    def modify_student(self,student_in:schemas.Student):
-        with db_session:
-            try:
-                student = select(s for s in models.Student if s.dni == student_in.dni)[:]
-                course = select(c for c in models.Course if c.course_name == student_in.course)[:]
-                if not course:
-                    raise HTTPException(status_code=404, detail="Curso no encontrado")
-                if student:
-                    student[0].set(dni=student_in.dni, email=student_in.email, firstName=student_in.firstName, lastName=student_in.lastName, courses=course[0])
+    def modify_student(self,student_in:schemas.ModifyStudent):
+            with db_session:
+                try:
+                    student = select(s for s in models.Student if s.dni == student_in.dni)[:]
+                    
+                    if not student:
+                        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+                    
+                    # Prepare update data
+                    update_data = {
+                        'dni': student_in.dni,
+                        'email': student_in.email,
+                        'firstName': student_in.firstName,
+                        'lastName': student_in.lastName
+                    }
+                    
+                    # Only update course if it's provided
+                    if hasattr(student_in, 'course') and student_in.course:
+                        course = select(c for c in models.Course if c.course_name == student_in.course)[:]
+                        if not course:
+                            raise HTTPException(status_code=404, detail="Curso no encontrado")
+                        update_data['courses'] = course[0]
+                    
+                    # Update student with the prepared data
+                    student[0].set(**update_data)
                     return student[0].to_dict()
-                else:
-                    raise HTTPException(status_code=404, detail="Estudiante no encontrado")
-            except TransactionIntegrityError as e:
-                print(f"Error de integridad transaccional: {e}")
-    
-
-
-
-
+                    
+                except TransactionIntegrityError as e:
+                    print(f"Error de integridad transaccional: {e}")

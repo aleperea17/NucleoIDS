@@ -36,11 +36,18 @@ def get_students(
     students = query.page(page, count)
     total = query.count()
 
-    students_conversion = [
-        {key: str(value) if isinstance(value, UUID)
-            else value for key, value in student.to_dict().items()}
-        for student in students
-    ]
+    students_conversion = []
+    for student in students:
+        student_dict = student.to_dict()
+        # Convert UUID to string if present
+        student_dict = {
+            key: str(value) if isinstance(value, UUID) else value 
+            for key, value in student_dict.items()
+        }
+        # Add course IDs
+
+        student_dict['course_ids'] = [str(course.id) for course in student.courses] if hasattr(student, 'courses') else []
+        students_conversion.append(student_dict)    
     return {
         "page": page,
         "count": len(students_conversion),
@@ -106,11 +113,11 @@ def create_student(student_request: StudentCreateRequest):
     }
 
 @router.put("/modify-student")
-def modify_student(student_in: schemas.Student, token:str = Depends(get_current_user)):
+def modify_student(student_in: schemas.ModifyStudent, token:str = Depends(get_current_user)):
     try:
         student = students_service.modify_student(student_in)
         if student:
-            return {f"Se editaron los datos con éxito.":student,"success":True}
+            return {"message": "Se editaron los datos con éxito.", "student": student,"success":True}
     except HTTPException as e:
         return {
             "message": e.detail,

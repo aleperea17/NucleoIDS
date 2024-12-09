@@ -96,12 +96,6 @@ export default function LoginForm() {
 							)}
 						</Button>
 					</Form>
-					<p className="text-center text-gray-600 mt-4">
-						No tienes una cuenta?{" "}
-						<a href="register" className="text-primary">
-							Crea una cuenta
-						</a>
-					</p>
 				</Card.Body>
 			</Card>
 		</section>

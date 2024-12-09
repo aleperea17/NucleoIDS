@@ -82,6 +82,13 @@ class Student(BaseModel):
     course: str
 
 
+class ModifyStudent(BaseModel):
+    dni: str
+    email: str
+    firstName: str
+    lastName:str
+    course: str | None = None
+
 class TokenVerificationRequest(BaseModel):
     token: str
 

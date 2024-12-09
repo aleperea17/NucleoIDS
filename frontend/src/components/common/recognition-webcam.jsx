@@ -13,6 +13,7 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 	const canvasRef = useRef(null);
 	const streamRef = useRef(null);
 	const intervalRef = useRef(null);
+	const abortControllerRef = useRef(null);
 
 	const markAttendance = async (img) => {
 		try {
@@ -30,9 +31,10 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 			console.log("ATTANDANCE RESPONSE", response);
 			if (response.data.data) {
 				onMarkAttendance(response.data.data);
-				// setStudents([...students, response.data.data]);
 				return response.data.message;
 			}
+
+			console.log(response.data);
 			if (response.data.success) {
 				return response.data.message;
 			} else if (response.data.status_code === 203) {
@@ -46,23 +48,36 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 
 	const getFaceLocation = async (img) => {
 		try {
+			abortControllerRef.current = new AbortController();
+			const { signal } = abortControllerRef.current;
 			const url = `${import.meta.env.VITE_PUBLIC_API_URL}/students/detectFace`;
-			const response = await axios.post(url, {
-				image_base64: img,
-			});
+			const response = await axios.post(
+				url,
+				{
+					image_base64: img,
+				},
+				{
+					signal,
+				},
+			);
 
 			const { success } = response.data;
 
 			if (success) {
 				setFaceCoords(response.data.coords);
 				const img = captureImage();
+				abortControllerRef.current.abort();
 				return img;
 			} else {
 				setFaceCoords(null);
 				return null;
 			}
 		} catch (err) {
-			console.error("Error detecting face:", err);
+			if (err.name === "AbortError") {
+				console.log("Solicitud abortada");
+			} else {
+				console.error("Error detecting face:", err);
+			}
 		}
 	};
 
@@ -107,6 +122,9 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 	}, []);
 
 	const deactivateWebcam = useCallback(() => {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort(); // Abort the current request if it exists
+		}
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track) => track.stop());
 			streamRef.current = null;
@@ -170,6 +188,7 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 			}
 			if (imgWithFace) {
 				const result = await markAttendance(img);
+				console.log(result);
 				if (result) {
 					console.log(result);
 					setIsSuccessfulMark(true);
@@ -180,6 +199,7 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 
 					// deactivateWebcam();
 				} else {
+					console.log("error, no se ha detectado la assitencia");
 					toast.error("No se ha detectado la asistencia");
 				}
 			}
@@ -198,6 +218,7 @@ export default function RecognitionWebcam({ onMarkAttendance, courseId }) {
 	useEffect(() => {
 		return () => {
 			deactivateWebcam();
+			if (abortControllerRef.current) abortControllerRef.current.abort();
 		};
 	}, [deactivateWebcam]);
 
